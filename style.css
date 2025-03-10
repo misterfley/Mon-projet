@@ -1,0 +1,94 @@
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.fade-up {
+  animation: fadeInUp 0.4s ease-out forwards;
+}
+body {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f0;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(8, 60px);
+  grid-template-rows: repeat(8, 60px);
+  width: 480px;
+  height: 480px;
+  border: 4px solid #4b371c;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  background-color: #8b5a2b;
+  position: relative;
+}
+
+.square {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 40px;
+  transition: background-color 0.3s;
+}
+
+.square.dark {
+  background-color: #4b371c;
+  color: white;
+}
+
+.square.light {
+  background-color: #e6cfa8;
+  color: black;
+}
+
+.square.selected {
+  outline: 3px solid #ffa726;
+}
+
+.square.valid-move {
+  background-color: #fdd835;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.player-indicator {
+  position: absolute;
+  top: 100px;
+  left: calc(50% - 57px);
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+}
+
+.square.highlight {
+  background-color: #8e44ad;
+  cursor: pointer;
+}
+
+.square:hover {
+  opacity: 0.8;
+}
+
+.board {
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.white-piece {
+  color: white;
+}
+
+.black-piece {
+  color: black;
+}
