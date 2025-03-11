@@ -4,41 +4,34 @@ const board = document.querySelector(".board");
 const squares = document.querySelectorAll(".square");
 
 function getPieceColor(piece) {
-  if (piece.classList.contains("white-piece")) {
-    return "white";
-  } else if (piece.classList.contains("black-piece")) {
-    return "black";
-  }
+  if (!piece) return null;
+  if (piece.classList.contains("white-piece")) return "white";
+  if (piece.classList.contains("black-piece")) return "black";
   return null;
 }
 
 function getPieceType(piece) {
-  const pieceChar = piece.textContent;
-  switch (pieceChar) {
-    case "♟":
-    case "♙":
-      return "pawn";
-    case "♜":
-    case "♖":
-      return "rook";
-    case "♞":
-    case "♘":
-      return "knight";
-    case "♝":
-    case "♗":
-      return "bishop";
-    case "♛":
-    case "♕":
-      return "queen";
-    case "♚":
-    case "♔":
-      return "king";
-    default:
-      return null;
-  }
+  const pieceChar = piece?.textContent;
+  const pieceMap = {
+    "♟": "pawn",
+    "♙": "pawn",
+    "♜": "rook",
+    "♖": "rook",
+    "♞": "knight",
+    "♘": "knight",
+    "♝": "bishop",
+    "♗": "bishop",
+    "♛": "queen",
+    "♕": "queen",
+    "♚": "king",
+    "♔": "king",
+  };
+  return pieceMap[pieceChar] || null;
 }
 
 function isValidMove(piece, fromSquare, toSquare) {
+  if (!piece) return false;
+
   const pieceType = getPieceType(piece);
   const fromId = fromSquare.id;
   const toId = toSquare.id;
@@ -49,9 +42,8 @@ function isValidMove(piece, fromSquare, toSquare) {
   const toRank = parseInt(toId.charAt(1), 10);
 
   const targetPiece = toSquare.querySelector("span");
-  if (targetPiece && getPieceColor(targetPiece) === getPieceColor(piece)) {
+  if (targetPiece && getPieceColor(targetPiece) === getPieceColor(piece))
     return false;
-  }
 
   switch (pieceType) {
     case "pawn":
@@ -78,7 +70,7 @@ function isValidMove(piece, fromSquare, toSquare) {
   }
 }
 
-// Vérifie si le chemin est bloqué pour la tour, le fou et la dame
+// Vérifie si le chemin est bloqué (tour, fou, reine)
 function isPathClear(fromFile, fromRank, toFile, toRank) {
   let fileStep = fromFile < toFile ? 1 : fromFile > toFile ? -1 : 0;
   let rankStep = fromRank < toRank ? 1 : fromRank > toRank ? -1 : 0;
@@ -88,16 +80,14 @@ function isPathClear(fromFile, fromRank, toFile, toRank) {
 
   while (file !== toFile.charCodeAt(0) || rank !== toRank) {
     let square = document.getElementById(String.fromCharCode(file) + rank);
-    if (square && square.querySelector("span")) {
-      return false;
-    }
+    if (square?.querySelector("span")) return false;
     file += fileStep;
     rank += rankStep;
   }
   return true;
 }
 
-// Vérification des mouvements
+// Vérif  mouvements spécifiques
 function isValidPawnMove(
   piece,
   fromFile,
@@ -109,26 +99,21 @@ function isValidPawnMove(
   const direction = getPieceColor(piece) === "white" ? 1 : -1;
   const startRank = getPieceColor(piece) === "white" ? 2 : 7;
 
-  if (fromFile === toFile && toRank === fromRank + direction && !targetPiece) {
+  if (fromFile === toFile && toRank === fromRank + direction && !targetPiece)
     return true;
-  }
-
   if (
     fromFile === toFile &&
     fromRank === startRank &&
-    toRank === fromRank + 2 * direction
-  ) {
-    let midSquare = document.getElementById(fromFile + (fromRank + direction));
-    return midSquare && !midSquare.querySelector("span") && !targetPiece;
-  }
-
+    toRank === fromRank + 2 * direction &&
+    !targetPiece
+  )
+    return true;
   if (
     Math.abs(toFile.charCodeAt(0) - fromFile.charCodeAt(0)) === 1 &&
     toRank === fromRank + direction &&
     targetPiece
-  ) {
+  )
     return true;
-  }
 
   return false;
 }
@@ -169,47 +154,184 @@ function isValidKnightMove(fromFile, fromRank, toFile, toRank) {
     (fileDiff === 2 && rankDiff === 1) || (fileDiff === 1 && rankDiff === 2)
   );
 }
+function updatePlayerIndicator() {
+  console.log("Mise à jour de l'indicateur de joueur...");
 
-// Gestion du clic sur une case
+  const indicator = document.querySelector(".player-indicator");
+  if (!indicator) {
+    console.error("L'élément .player-indicator n'a pas été trouvé !");
+    return;
+  }
+
+  indicator.classList.add("fade-up");
+  indicator.innerHTML = `${
+    currentPlayer.charAt(0).toUpperCase() + currentPlayer.slice(1)
+  }'s turn`;
+
+  setTimeout(() => {
+    indicator.classList.remove("fade-up");
+  }, 500);
+}
+
+// Gestion  clic sur une case
 function handleClick(e) {
   const square = e.target.closest(".square");
   if (!square) return;
 
   const piece = square.querySelector("span");
+
   if (selectedSquare) {
     if (
       isValidMove(selectedSquare.querySelector("span"), selectedSquare, square)
     ) {
+      //   mouvement laisse  roi en échec?
+      if (isKingInCheckAfterMove(selectedSquare, square, currentPlayer)) {
+        alert("Mouvement illégal : votre roi serait en échec !");
+        selectedSquare.classList.remove("selected");
+        selectedSquare = null;
+        return;
+      }
+
+      // Déplacement valide, maj echiquier
       square.innerHTML = selectedSquare.innerHTML;
       selectedSquare.innerHTML = "";
       selectedSquare.classList.remove("selected");
       selectedSquare = null;
 
+      // Vérif après chaque coup
+      if (isKingInCheck(currentPlayer)) {
+        alert("Échec !");
+      }
+
       currentPlayer = currentPlayer === "white" ? "black" : "white";
       updatePlayerIndicator();
+      checkGameStatus();
     } else {
+      // Déplacement invalide
       selectedSquare.classList.remove("selected");
       selectedSquare = null;
     }
   } else if (piece && getPieceColor(piece) === currentPlayer) {
-    if (selectedSquare) {
-      selectedSquare.classList.remove("selected");
-    }
+    if (selectedSquare) selectedSquare.classList.remove("selected");
     selectedSquare = square;
     selectedSquare.classList.add("selected");
   }
 }
 
-function updatePlayerIndicator() {
-  const indicator = document.querySelector(".player-indicator");
-  indicator.classList.add("fade-up");
-  indicator.innerHTML = `${
-    currentPlayer.charAt(0).toUpperCase() + currentPlayer.slice(1)
-  }'s turn`;
-  setTimeout(() => {
-    indicator.classList.remove("fade-up");
-  }, "500");
+function isKingInCheck(color) {
+  // Trouver position  roi du joueur actuel
+  const kingSquare = [...document.querySelectorAll(".square")].find(
+    (square) => {
+      const piece = square.querySelector("span");
+      return (
+        piece &&
+        getPieceColor(piece) === color &&
+        getPieceType(piece) === "king"
+      );
+    }
+  );
+
+  if (!kingSquare) return false; // Sécurité : le roi ne devrait jamais disparaître
+
+  // Vérif si pièce adverse peut capturer roi
+  return [...document.querySelectorAll(".square")].some((square) => {
+    const piece = square.querySelector("span");
+    if (piece && getPieceColor(piece) !== color) {
+      return isValidMove(piece, square, kingSquare);
+    }
+    return false;
+  });
+}
+function isKingInCheckAfterMove(fromSquare, toSquare, color) {
+  const tempContent = toSquare.innerHTML;
+  toSquare.innerHTML = fromSquare.innerHTML;
+  fromSquare.innerHTML = "";
+
+  const kingInCheck = isKingInCheck(color);
+
+  // Restaurer état initial
+  fromSquare.innerHTML = toSquare.innerHTML;
+  toSquare.innerHTML = tempContent;
+
+  return kingInCheck;
 }
 
-squares.forEach((square) => square.addEventListener("click", handleClick));
-updatePlayerIndicator();
+function checkGameStatus() {
+  if (isKingInCheck(currentPlayer)) {
+    if (!canKingEscape(currentPlayer) && !canBlockCheck(currentPlayer)) {
+      alert(
+        `Échec et mat ! ${currentPlayer === "white" ? "Noir" : "Blanc"} gagne !`
+      );
+    } else {
+      alert("Échec !");
+    }
+  }
+}
+function canKingEscape(color) {
+  const kingSquare = [...document.querySelectorAll(".square")].find(
+    (square) => {
+      const piece = square.querySelector("span");
+      return (
+        piece &&
+        getPieceColor(piece) === color &&
+        getPieceType(piece) === "king"
+      );
+    }
+  );
+
+  if (!kingSquare) return false;
+
+  const kingMoves = [
+    [1, 0],
+    [-1, 0],
+    [0, 1],
+    [0, -1],
+    [1, 1],
+    [-1, -1],
+    [1, -1],
+    [-1, 1],
+  ];
+
+  return kingMoves.some(([dx, dy]) => {
+    const newFile = String.fromCharCode(kingSquare.id.charCodeAt(0) + dx);
+    const newRank = parseInt(kingSquare.id.charAt(1), 10) + dy;
+    const newSquare = document.getElementById(newFile + newRank);
+
+    if (
+      newSquare &&
+      (!newSquare.querySelector("span") ||
+        getPieceColor(newSquare.querySelector("span")) !== color)
+    ) {
+      return !isKingInCheckAfterMove(kingSquare, newSquare, color);
+    }
+    return false;
+  });
+}
+
+function canBlockCheck(color) {
+  const pieces = [...document.querySelectorAll(".square")].filter((square) => {
+    const piece = square.querySelector("span");
+    return piece && getPieceColor(piece) === color;
+  });
+
+  return pieces.some((square) => {
+    const piece = square.querySelector("span");
+    return [...document.querySelectorAll(".square")].some((target) => {
+      if (
+        target !== square &&
+        (!target.querySelector("span") ||
+          getPieceColor(target.querySelector("span")) !== color)
+      ) {
+        return (
+          isValidMove(piece, square, target) &&
+          !isKingInCheckAfterMove(square, target, color)
+        );
+      }
+      return false;
+    });
+  });
+}
+
+squares.forEach((square) => {
+  square.addEventListener("click", handleClick);
+});

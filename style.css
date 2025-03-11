@@ -12,6 +12,7 @@
 .fade-up {
   animation: fadeInUp 0.4s ease-out forwards;
 }
+
 body {
   position: relative;
   display: flex;
@@ -59,8 +60,9 @@ body {
 
 .square.valid-move {
   background-color: #fdd835;
+  border: 3px solid #fbc02d;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, border 0.2s;
 }
 
 .player-indicator {
@@ -70,6 +72,10 @@ body {
   font-size: 20px;
   font-weight: bold;
   color: #333;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 10px 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 .square.highlight {
@@ -87,8 +93,14 @@ body {
 
 .white-piece {
   color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
 }
 
 .black-piece {
   color: black;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3);
+}
+
+.piece-move {
+  transition: transform 0.3s ease-in-out;
 }
