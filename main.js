@@ -184,7 +184,7 @@ function handleClick(e) {
     if (
       isValidMove(selectedSquare.querySelector("span"), selectedSquare, square)
     ) {
-      //   mouvement laisse  roi en échec?
+      //  le mouvement laisse le roi en échec?
       if (isKingInCheckAfterMove(selectedSquare, square, currentPlayer)) {
         alert("Mouvement illégal : votre roi serait en échec !");
         selectedSquare.classList.remove("selected");
@@ -212,6 +212,7 @@ function handleClick(e) {
       selectedSquare = null;
     }
   } else if (piece && getPieceColor(piece) === currentPlayer) {
+    // Sélection de la pièce
     if (selectedSquare) selectedSquare.classList.remove("selected");
     selectedSquare = square;
     selectedSquare.classList.add("selected");
@@ -219,7 +220,7 @@ function handleClick(e) {
 }
 
 function isKingInCheck(color) {
-  // Trouver position  roi du joueur actuel
+  // Trouver la position du roi du joueur actuel
   const kingSquare = [...document.querySelectorAll(".square")].find(
     (square) => {
       const piece = square.querySelector("span");
@@ -233,7 +234,7 @@ function isKingInCheck(color) {
 
   if (!kingSquare) return false; // Sécurité : le roi ne devrait jamais disparaître
 
-  // Vérif si pièce adverse peut capturer roi
+  // Vérifier si une pièce adverse peut capturer le roi
   return [...document.querySelectorAll(".square")].some((square) => {
     const piece = square.querySelector("span");
     if (piece && getPieceColor(piece) !== color) {
@@ -249,7 +250,7 @@ function isKingInCheckAfterMove(fromSquare, toSquare, color) {
 
   const kingInCheck = isKingInCheck(color);
 
-  // Restaurer état initial
+  // Restaurer l'état initial
   fromSquare.innerHTML = toSquare.innerHTML;
   toSquare.innerHTML = tempContent;
 
