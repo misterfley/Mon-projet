@@ -308,7 +308,6 @@ function canKingEscape(color) {
     return false;
   });
 }
-
 function canBlockCheck(color) {
   const pieces = [...document.querySelectorAll(".square")].filter((square) => {
     const piece = square.querySelector("span");
