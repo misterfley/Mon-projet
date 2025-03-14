@@ -1,7 +1,15 @@
 let selectedSquare = null;
-let currentPlayer = "white"; // Le joueur blanc commence
+let currentPlayer = "white"; //  joueur blanc commence
 const board = document.querySelector(".board");
 const squares = document.querySelectorAll(".square");
+
+// Variables pour suivre  mouvements  roi et  tours
+let whiteKingMoved = false,
+  blackKingMoved = false;
+let whiteRookLeftMoved = false,
+  whiteRookRightMoved = false;
+let blackRookLeftMoved = false,
+  blackRookRightMoved = false;
 
 function getPieceColor(piece) {
   if (!piece) return null;
@@ -9,7 +17,7 @@ function getPieceColor(piece) {
   if (piece.classList.contains("black-piece")) return "black";
   return null;
 }
-
+// fonction utilitaires
 function getPieceType(piece) {
   const pieceChar = piece?.textContent;
   const pieceMap = {
@@ -29,19 +37,32 @@ function getPieceType(piece) {
   return pieceMap[pieceChar] || null;
 }
 
+function isPathClear(fromFile, fromRank, toFile, toRank) {
+  let fileStep = fromFile < toFile ? 1 : fromFile > toFile ? -1 : 0;
+  let rankStep = fromRank < toRank ? 1 : fromRank > toRank ? -1 : 0;
+  let file = fromFile.charCodeAt(0) + fileStep;
+  let rank = fromRank + rankStep;
+
+  while (file !== toFile.charCodeAt(0) || rank !== toRank) {
+    let square = document.getElementById(String.fromCharCode(file) + rank);
+    if (!square || square.querySelector("span")) return false;
+    file += fileStep;
+    rank += rankStep;
+  }
+  return true;
+}
+//gestion deplacements
 function isValidMove(piece, fromSquare, toSquare) {
   if (!piece) return false;
-
   const pieceType = getPieceType(piece);
-  const fromId = fromSquare.id;
-  const toId = toSquare.id;
-
-  const fromFile = fromId.charAt(0);
-  const fromRank = parseInt(fromId.charAt(1), 10);
-  const toFile = toId.charAt(0);
-  const toRank = parseInt(toId.charAt(1), 10);
-
+  const fromId = fromSquare.id,
+    toId = toSquare.id;
+  const fromFile = fromId[0],
+    fromRank = parseInt(fromId[1], 10);
+  const toFile = toId[0],
+    toRank = parseInt(toId[1], 10);
   const targetPiece = toSquare.querySelector("span");
+
   if (targetPiece && getPieceColor(targetPiece) === getPieceColor(piece))
     return false;
 
@@ -55,8 +76,10 @@ function isValidMove(piece, fromSquare, toSquare) {
         toRank,
         targetPiece
       );
+
     case "rook":
       return isValidRookMove(fromFile, fromRank, toFile, toRank);
+
     case "knight":
       return isValidKnightMove(fromFile, fromRank, toFile, toRank);
     case "bishop":
@@ -64,60 +87,14 @@ function isValidMove(piece, fromSquare, toSquare) {
     case "queen":
       return isValidQueenMove(fromFile, fromRank, toFile, toRank);
     case "king":
+      if (Math.abs(toFile.charCodeAt(0) - fromFile.charCodeAt(0)) === 2) {
+        return isValidCastlingMove(piece, fromFile, fromRank, toFile, toRank);
+      }
       return isValidKingMove(fromFile, fromRank, toFile, toRank);
     default:
       return false;
   }
 }
-
-// Vérifie si le chemin est bloqué (tour, fou, reine)
-function isPathClear(fromFile, fromRank, toFile, toRank) {
-  let fileStep = fromFile < toFile ? 1 : fromFile > toFile ? -1 : 0;
-  let rankStep = fromRank < toRank ? 1 : fromRank > toRank ? -1 : 0;
-
-  let file = fromFile.charCodeAt(0) + fileStep;
-  let rank = fromRank + rankStep;
-
-  while (file !== toFile.charCodeAt(0) || rank !== toRank) {
-    let square = document.getElementById(String.fromCharCode(file) + rank);
-    if (square?.querySelector("span")) return false;
-    file += fileStep;
-    rank += rankStep;
-  }
-  return true;
-}
-
-// Vérif  mouvements spécifiques
-function isValidPawnMove(
-  piece,
-  fromFile,
-  fromRank,
-  toFile,
-  toRank,
-  targetPiece
-) {
-  const direction = getPieceColor(piece) === "white" ? 1 : -1;
-  const startRank = getPieceColor(piece) === "white" ? 2 : 7;
-
-  if (fromFile === toFile && toRank === fromRank + direction && !targetPiece)
-    return true;
-  if (
-    fromFile === toFile &&
-    fromRank === startRank &&
-    toRank === fromRank + 2 * direction &&
-    !targetPiece
-  )
-    return true;
-  if (
-    Math.abs(toFile.charCodeAt(0) - fromFile.charCodeAt(0)) === 1 &&
-    toRank === fromRank + direction &&
-    targetPiece
-  )
-    return true;
-
-  return false;
-}
-
 function isValidRookMove(fromFile, fromRank, toFile, toRank) {
   return (
     (fromFile === toFile || fromRank === toRank) &&
@@ -140,13 +117,6 @@ function isValidQueenMove(fromFile, fromRank, toFile, toRank) {
   );
 }
 
-function isValidKingMove(fromFile, fromRank, toFile, toRank) {
-  return (
-    Math.abs(toFile.charCodeAt(0) - fromFile.charCodeAt(0)) <= 1 &&
-    Math.abs(toRank - fromRank) <= 1
-  );
-}
-
 function isValidKnightMove(fromFile, fromRank, toFile, toRank) {
   const fileDiff = Math.abs(toFile.charCodeAt(0) - fromFile.charCodeAt(0));
   const rankDiff = Math.abs(toRank - fromRank);
@@ -154,73 +124,68 @@ function isValidKnightMove(fromFile, fromRank, toFile, toRank) {
     (fileDiff === 2 && rankDiff === 1) || (fileDiff === 1 && rankDiff === 2)
   );
 }
-function updatePlayerIndicator() {
-  console.log("Mise à jour de l'indicateur de joueur...");
 
-  const indicator = document.querySelector(".player-indicator");
-  if (!indicator) {
-    console.error("L'élément .player-indicator n'a pas été trouvé !");
-    return;
+function isValidKingMove(fromFile, fromRank, toFile, toRank) {
+  return (
+    Math.abs(toFile.charCodeAt(0) - fromFile.charCodeAt(0)) <= 1 &&
+    Math.abs(toRank - fromRank) <= 1
+  );
+}
+function isValidPawnMove(
+  piece,
+  fromFile,
+  fromRank,
+  toFile,
+  toRank,
+  targetPiece
+) {
+  const direction = getPieceColor(piece) === "white" ? 1 : -1;
+  const startRank = getPieceColor(piece) === "white" ? 2 : 7;
+
+  // une case vers l'avant
+  if (fromFile === toFile && toRank === fromRank + direction && !targetPiece) {
+    return true;
   }
 
-  indicator.classList.add("fade-up");
-  indicator.innerHTML = `${
-    currentPlayer.charAt(0).toUpperCase() + currentPlayer.slice(1)
-  }'s turn`;
+  // deux cases depuis la position initiale
+  if (
+    fromFile === toFile &&
+    fromRank === startRank &&
+    toRank === fromRank + 2 * direction &&
+    !targetPiece &&
+    isPathClear(fromFile, fromRank, toFile, toRank)
+  ) {
+    return true;
+  }
 
-  setTimeout(() => {
-    indicator.classList.remove("fade-up");
-  }, 500);
+  // Capture  diagonale
+  if (
+    Math.abs(toFile.charCodeAt(0) - fromFile.charCodeAt(0)) === 1 &&
+    toRank === fromRank + direction &&
+    targetPiece
+  ) {
+    return true;
+  }
+
+  return false;
 }
 
-// Gestion  clic sur une case
-function handleClick(e) {
-  const square = e.target.closest(".square");
-  if (!square) return;
+function isKingInCheckAfterMove(fromSquare, toSquare, color) {
+  //Sauvegarde l'état initial
+  const tempContent = toSquare.innerHTML;
+  toSquare.innerHTML = fromSquare.innerHTML;
+  fromSquare.innerHTML = "";
 
-  const piece = square.querySelector("span");
+  const kingInCheck = isKingInCheck(color);
 
-  if (selectedSquare) {
-    if (
-      isValidMove(selectedSquare.querySelector("span"), selectedSquare, square)
-    ) {
-      //  le mouvement laisse le roi en échec?
-      if (isKingInCheckAfterMove(selectedSquare, square, currentPlayer)) {
-        alert("Mouvement illégal : votre roi serait en échec !");
-        selectedSquare.classList.remove("selected");
-        selectedSquare = null;
-        return;
-      }
+  // état initial
+  fromSquare.innerHTML = toSquare.innerHTML;
+  toSquare.innerHTML = tempContent;
 
-      // Déplacement valide, maj echiquier
-      square.innerHTML = selectedSquare.innerHTML;
-      selectedSquare.innerHTML = "";
-      selectedSquare.classList.remove("selected");
-      selectedSquare = null;
-
-      // Vérif après chaque coup
-      if (isKingInCheck(currentPlayer)) {
-        alert("Échec !");
-      }
-
-      currentPlayer = currentPlayer === "white" ? "black" : "white";
-      updatePlayerIndicator();
-      checkGameStatus();
-    } else {
-      // Déplacement invalide
-      selectedSquare.classList.remove("selected");
-      selectedSquare = null;
-    }
-  } else if (piece && getPieceColor(piece) === currentPlayer) {
-    // Sélection de la pièce
-    if (selectedSquare) selectedSquare.classList.remove("selected");
-    selectedSquare = square;
-    selectedSquare.classList.add("selected");
-  }
+  return kingInCheck;
 }
 
 function isKingInCheck(color) {
-  // Trouver la position du roi du joueur actuel
   const kingSquare = [...document.querySelectorAll(".square")].find(
     (square) => {
       const piece = square.querySelector("span");
@@ -232,31 +197,149 @@ function isKingInCheck(color) {
     }
   );
 
-  if (!kingSquare) return false; // Sécurité : le roi ne devrait jamais disparaître
+  if (!kingSquare) return false; // Le roi doit jamais disparaître
 
-  // Vérifier si une pièce adverse peut capturer le roi
   return [...document.querySelectorAll(".square")].some((square) => {
     const piece = square.querySelector("span");
-    if (piece && getPieceColor(piece) !== color) {
-      return isValidMove(piece, square, kingSquare);
-    }
-    return false;
+    return (
+      piece &&
+      getPieceColor(piece) !== color &&
+      isValidMove(piece, square, kingSquare)
+    );
   });
 }
-function isKingInCheckAfterMove(fromSquare, toSquare, color) {
-  const tempContent = toSquare.innerHTML;
-  toSquare.innerHTML = fromSquare.innerHTML;
-  fromSquare.innerHTML = "";
 
-  const kingInCheck = isKingInCheck(color);
+//gestion intercations joueur
+function handleClick(e) {
+  const square = e.target.closest(".square");
+  if (!square) return;
 
-  // Restaurer l'état initial
-  fromSquare.innerHTML = toSquare.innerHTML;
-  toSquare.innerHTML = tempContent;
+  console.log(`Case cliquée: ${square.id}`);
 
-  return kingInCheck;
+  if (selectedSquare === square) {
+    console.log("Désélection de la case");
+    selectedSquare.classList.remove("selected");
+    selectedSquare = null;
+    return;
+  }
+
+  const piece = square.querySelector("span");
+
+  if (selectedSquare) {
+    const movingPiece = selectedSquare.querySelector("span");
+    if (!movingPiece) return;
+
+    if (isValidMove(movingPiece, selectedSquare, square)) {
+      console.log("Mouvement valide !");
+      if (isKingInCheckAfterMove(selectedSquare, square, currentPlayer)) {
+        showMessage("Mouvement illégal : votre roi serait en échec !");
+        selectedSquare.classList.remove("selected");
+        selectedSquare = null;
+        return;
+      }
+
+      if (
+        getPieceType(movingPiece) === "king" &&
+        Math.abs(
+          selectedSquare.id[0].charCodeAt(0) - square.id[0].charCodeAt(0)
+        ) === 2
+      ) {
+        handleCastlingMove(selectedSquare, square);
+      } else {
+        square.innerHTML = selectedSquare.innerHTML;
+        selectedSquare.innerHTML = "";
+      }
+
+      updateCastlingRights(movingPiece, selectedSquare.id);
+      selectedSquare.classList.remove("selected");
+      selectedSquare = null;
+
+      if (isKingInCheck(currentPlayer)) showMessage("Échec !");
+      currentPlayer = currentPlayer === "white" ? "black" : "white";
+      updatePlayerIndicator();
+      checkGameStatus();
+    } else {
+      console.log("Mouvement invalide !");
+      selectedSquare.classList.remove("selected");
+      selectedSquare = null;
+    }
+  } else if (piece && getPieceColor(piece) === currentPlayer) {
+    console.log("Sélection de la pièce");
+    if (selectedSquare) selectedSquare.classList.remove("selected");
+    selectedSquare = square;
+    selectedSquare.classList.add("selected");
+  }
 }
 
+function showMessage(message) {
+  const messageBox = document.getElementById("game-message");
+  if (messageBox) {
+    messageBox.textContent = message;
+    messageBox.style.display = "block";
+    setTimeout(() => {
+      messageBox.style.display = "none";
+    }, 2000);
+  }
+}
+
+function updatePlayerIndicator() {
+  const indicator = document.querySelector(".player-indicator");
+  if (!indicator) return;
+
+  indicator.classList.add("fade-up");
+  indicator.innerHTML = `${
+    currentPlayer.charAt(0).toUpperCase() + currentPlayer.slice(1)
+  }'s turn`;
+  setTimeout(() => indicator.classList.remove("fade-up"), 500);
+}
+squares.forEach((square) => square.addEventListener("click", handleClick));
+function updateCastlingRights(movingPiece, fromSquare) {
+  const pieceType = getPieceType(movingPiece);
+  const color = getPieceColor(movingPiece);
+
+  if (pieceType === "king") {
+    if (color === "white") whiteKingMoved = true;
+    else blackKingMoved = true;
+  }
+
+  if (pieceType === "rook") {
+    if (color === "white") {
+      if (fromSquare === "a1") whiteRookLeftMoved = true;
+      if (fromSquare === "h1") whiteRookRightMoved = true;
+    } else {
+      if (fromSquare === "a8") blackRookLeftMoved = true;
+      if (fromSquare === "h8") blackRookRightMoved = true;
+    }
+  }
+}
+
+function handleCastlingMove(fromSquare, toSquare) {
+  const king = fromSquare.querySelector("span");
+  const fromFile = fromSquare.id[0];
+  const toFile = toSquare.id[0];
+  const rank = fromSquare.id[1];
+
+  let rookSquare, newRookSquare;
+
+  if (toFile === "g") {
+    rookSquare = document.getElementById(`h${rank}`);
+    newRookSquare = document.getElementById(`f${rank}`);
+  } else if (toFile === "c") {
+    rookSquare = document.getElementById(`a${rank}`);
+    newRookSquare = document.getElementById(`d${rank}`);
+  } else {
+    return;
+  }
+
+  const rook = rookSquare?.querySelector("span");
+  if (!rook) return;
+
+  toSquare.appendChild(king);
+  fromSquare.innerHTML = "";
+
+  newRookSquare.appendChild(rook);
+  rookSquare.innerHTML = "";
+}
 function checkGameStatus() {
   if (isKingInCheck(currentPlayer)) {
     if (!canKingEscape(currentPlayer) && !canBlockCheck(currentPlayer)) {
@@ -295,7 +378,7 @@ function canKingEscape(color) {
 
   return kingMoves.some(([dx, dy]) => {
     const newFile = String.fromCharCode(kingSquare.id.charCodeAt(0) + dx);
-    const newRank = parseInt(kingSquare.id.charAt(1), 10) + dy;
+    const newRank = parseInt(kingSquare.id[1], 10) + dy;
     const newSquare = document.getElementById(newFile + newRank);
 
     if (
@@ -308,6 +391,7 @@ function canKingEscape(color) {
     return false;
   });
 }
+
 function canBlockCheck(color) {
   const pieces = [...document.querySelectorAll(".square")].filter((square) => {
     const piece = square.querySelector("span");
@@ -331,7 +415,28 @@ function canBlockCheck(color) {
     });
   });
 }
+function isValidCastlingMove(piece, fromFile, fromRank, toFile, toRank) {
+  if (fromRank !== toRank) return false; // Roque seulement sur la même ligne
 
-squares.forEach((square) => {
-  square.addEventListener("click", handleClick);
-});
+  const color = getPieceColor(piece);
+  const isWhite = color === "white";
+  const kingMoved = isWhite ? whiteKingMoved : blackKingMoved;
+  const leftRookMoved = isWhite ? whiteRookLeftMoved : blackRookLeftMoved;
+  const rightRookMoved = isWhite ? whiteRookRightMoved : blackRookRightMoved;
+
+  if (kingMoved) return false;
+
+  if (toFile === "g") {
+    // Roque petit (côté roi)
+    if (rightRookMoved) return false;
+    return isPathClear(fromFile, fromRank, "h", fromRank);
+  }
+
+  if (toFile === "c") {
+    // Roque grand (côté dame)
+    if (leftRookMoved) return false;
+    return isPathClear("a", fromRank, fromFile, fromRank);
+  }
+
+  return false;
+}
