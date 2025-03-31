@@ -209,7 +209,7 @@ function isKingInCheck(color) {
   });
 }
 
-//gestion intercations joueur
+//gestion interactions joueur
 function handleClick(e) {
   const square = e.target.closest(".square");
   if (!square) return;
@@ -232,7 +232,7 @@ function handleClick(e) {
     if (isValidMove(movingPiece, selectedSquare, square)) {
       console.log("Mouvement valide !");
       if (isKingInCheckAfterMove(selectedSquare, square, currentPlayer)) {
-        showMessage("Mouvement illégal : votre roi serait en échec !");
+        showMessage("Impossible : votre roi serait en échec !");
         selectedSquare.classList.remove("selected");
         selectedSquare = null;
         return;

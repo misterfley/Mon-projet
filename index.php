@@ -9,8 +9,7 @@
 </head>
 
 <body>
-  <div id="game-message"></div>
-
+  <div class="player-indicator">White's turn</div>
   <div class="board">
     <!-- Rangée 1 pour les pièces noires -->
     <div class="square light" id="a8"><span class="black-piece">♜</span></div>
