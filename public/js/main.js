@@ -274,11 +274,19 @@ function handleClick(e) {
 function showMessage(message) {
   const messageBox = document.getElementById("game-message");
   if (messageBox) {
+    // Effacer tous les anciens messages avant d'afficher un nouveau
+    messageBox.style.display = "none";
+
+    // Afficher le nouveau message
     messageBox.textContent = message;
     messageBox.style.display = "block";
+    messageBox.classList.add("fade-up"); // Ajouter une animation d'entrée
+
+    // Masquer le message après 4 secondes
     setTimeout(() => {
       messageBox.style.display = "none";
-    }, 2000);
+      messageBox.classList.remove("fade-up");
+    }, 4000); // Augmenter le délai pour s'assurer que le message est bien visible
   }
 }
 
@@ -341,16 +349,27 @@ function handleCastlingMove(fromSquare, toSquare) {
   rookSquare.innerHTML = "";
 }
 function checkGameStatus() {
+  const gameStatusMessage = document.getElementById("game-status");
+
+  // Vérifie si le roi est en échec
   if (isKingInCheck(currentPlayer)) {
-    if (!canKingEscape(currentPlayer) && !canBlockCheck(currentPlayer)) {
-      alert(
-        `Échec et mat ! ${currentPlayer === "white" ? "Noir" : "Blanc"} gagne !`
-      );
-    } else {
-      alert("Échec !");
+    showMessage("Échec"); // Affiche simplement "Échec"
+  } else {
+    // Si le roi n'est plus en échec, masquer le message "Échec"
+    if (gameStatusMessage) {
+      gameStatusMessage.style.display = "none";
     }
   }
+
+  // Vérification de l'échec et mat
+  if (!canKingEscape(currentPlayer) && !canBlockCheck(currentPlayer)) {
+    const winner = currentPlayer === "white" ? "Noir" : "Blanc";
+    showMessage(`Échec et mat ! ${winner} gagne !`);
+    // Ajouter ici des actions pour arrêter la partie si nécessaire, par exemple :
+    // stopGame();
+  }
 }
+
 function canKingEscape(color) {
   const kingSquare = [...document.querySelectorAll(".square")].find(
     (square) => {

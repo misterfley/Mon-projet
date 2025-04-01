@@ -1,0 +1,99 @@
+/* Styles spécifiques à l'échiquier */
+.fade-up {
+  animation: fadeInUp 0.6s ease-out forwards; /* Augmenter la durée à 0.6s */
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+.board {
+  display: grid;
+  grid-template-columns: repeat(8, 60px);
+  grid-template-rows: repeat(8, 60px);
+  width: 480px;
+  height: 480px;
+  border: 4px solid #4b371c;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  background-color: #8b5a2b;
+  position: relative;
+}
+
+.square {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 40px;
+  transition: background-color 0.3s;
+}
+
+.square.dark {
+  background-color: #4b371c;
+  color: white;
+}
+
+.square.light {
+  background-color: #e6cfa8;
+  color: black;
+}
+
+.square.selected {
+  outline: 3px solid #ffa726;
+  background-color: #ffe0b3; /* Changer le fond lorsque la case est sélectionnée */
+}
+
+.square.valid-move {
+  background-color: #fdd835;
+  border: 3px solid #fbc02d;
+  cursor: pointer;
+  transition: background-color 0.2s, border 0.2s;
+  box-shadow: 0 0 10px rgba(255, 204, 0, 0.5); /* Ajouter une ombre pour plus de visibilité */
+}
+
+.player-indicator {
+  position: absolute;
+  top: 100px;
+  left: calc(50% - 57px);
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 10px 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.square.highlight {
+  background-color: #8e44ad;
+  cursor: pointer;
+}
+
+.square:hover {
+  opacity: 0.8;
+  background-color: rgba(
+    0,
+    0,
+    0,
+    0.1
+  ); /* Changer légèrement la couleur de fond au survol */
+}
+
+.white-piece {
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.black-piece {
+  color: black;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3);
+}
+
+.piece-move {
+  transition: transform 0.3s ease-in-out;
+}

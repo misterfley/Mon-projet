@@ -20,7 +20,8 @@ include "base.php"; // Inclusion du fichier de base
         // Affichage des messages d'erreur ou de succès
         if (isset($_GET['message'])) {
             $status = $_GET['status'] ?? 'info';
-            echo "<div class='alert alert-$status text-center'>{$_GET['message']}</div>";
+            $message = htmlspecialchars($_GET['message'], ENT_QUOTES, 'UTF-8');
+            echo "<div class='alert alert-$status text-center'>$message</div>";
         }
         ?>
 
@@ -39,6 +40,9 @@ include "base.php"; // Inclusion du fichier de base
 
             <label class="form-label" for="password_player">Mot de passe</label>
             <input class="form-control" type="password" name="password_player" placeholder="Mot de passe" required>
+
+            <label class="form-label" for="password_confirm_player">Confirmer le mot de passe</label>
+            <input class="form-control" type="password" name="password_confirm_player" placeholder="Confirmer le mot de passe" required>
 
             <label class="form-label" for="image_player">Photo de profil</label>
             <input class="form-control" type="file" name="image_player">
