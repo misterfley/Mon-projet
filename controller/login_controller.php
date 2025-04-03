@@ -25,7 +25,7 @@ if (!empty($_POST['email_player']) && !empty($_POST['password_player'])) {
         $_SESSION['token'] = bin2hex(random_bytes(16)); // Protection CSRF
 
         // Redirection vers la page du plateau
-        header("Location: ../view/board.php");
+        header("Location: ../view/profile.php");
         exit();
     } else {
         // Email inconnu ou mot de passe invalide

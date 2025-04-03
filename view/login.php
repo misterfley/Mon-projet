@@ -1,5 +1,6 @@
 <?php
 session_start();
+include("message.php");
 ?>
 <!DOCTYPE html>
 <html lang="fr">
