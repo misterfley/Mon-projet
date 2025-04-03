@@ -22,7 +22,11 @@
 
 <body>
     <?php include("base.php"); ?>
-
+    <?php if (isset($_GET['message']) && isset($_GET['status'])): ?>
+        <div class="alert alert-<?php echo $_GET['status']; ?> text-center m-3" role="alert">
+            <?php echo htmlspecialchars($_GET['message']); ?>
+        </div>
+    <?php endif; ?>
     <div id="thanos" class="text-center">
         <img src="popcorn2.png" class="img-fluid" alt="Popcorn" />
         <h1 class="text-light">"Plongez dans l'univers des échecs, tout en vous amusant."</h1>

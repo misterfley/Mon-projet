@@ -17,19 +17,19 @@ if (session_status() === PHP_SESSION_NONE) {
                 <?php if (!isset($_SESSION['nickname_player'])) { ?>
                     <!-- Non connecté -->
                     <li class="nav-item">
-                        <a class="nav-link text-light" href="view/add_user_form.php">
+                        <a class="nav-link text-light" href="add_user_form.php">
                             <h5>Inscription</h5>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-light" href="view/login.php">
+                        <a class="nav-link text-light" href="login.php">
                             <h5>Connexion</h5>
                         </a>
                     </li>
                 <?php } else { ?>
                     <!-- Connecté -->
                     <li class="nav-item">
-                        <a class="nav-link text-light" href="game.php">
+                        <a class="nav-link text-light" href="board.php">
                             <h5>Jouer</h5>
                         </a>
                     </li>

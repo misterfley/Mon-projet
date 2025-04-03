@@ -58,7 +58,7 @@ if (
                     ]);
 
                     if ($verif) {
-                        header("Location: ../view/add_user_form.php?message=Inscription réussie&status=success");
+                        header("Location: ../view/login.php?message=Inscription réussie&status=success");
                         exit();
                     } else {
                         // En cas d'erreur SQL
