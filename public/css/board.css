@@ -1,8 +1,3 @@
-/* Styles spécifiques à l'échiquier */
-.fade-up {
-  animation: fadeInUp 0.6s ease-out forwards; /* Augmenter la durée à 0.6s */
-}
-
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -13,6 +8,30 @@
     transform: scale(1) translateY(0);
   }
 }
+
+.fade-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* Ne s'applique qu'à board.php */
+body.board-page {
+  background-color: #f0f0f0;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  display: block;
+}
+
+.board-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding-top: 80px;
+  padding-bottom: 40px;
+  box-sizing: border-box;
+}
+
 .board {
   display: grid;
   grid-template-columns: repeat(8, 60px);
@@ -45,7 +64,7 @@
 
 .square.selected {
   outline: 3px solid #ffa726;
-  background-color: #ffe0b3; /* Changer le fond lorsque la case est sélectionnée */
+  background-color: #ffe0b3;
 }
 
 .square.valid-move {
@@ -53,20 +72,7 @@
   border: 3px solid #fbc02d;
   cursor: pointer;
   transition: background-color 0.2s, border 0.2s;
-  box-shadow: 0 0 10px rgba(255, 204, 0, 0.5); /* Ajouter une ombre pour plus de visibilité */
-}
-
-.player-indicator {
-  position: absolute;
-  top: 100px;
-  left: calc(50% - 57px);
-  font-size: 20px;
-  font-weight: bold;
-  color: #333;
-  background: rgba(255, 255, 255, 0.8);
-  padding: 10px 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
 }
 
 .square.highlight {
@@ -76,12 +82,7 @@
 
 .square:hover {
   opacity: 0.8;
-  background-color: rgba(
-    0,
-    0,
-    0,
-    0.1
-  ); /* Changer légèrement la couleur de fond au survol */
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .white-piece {
@@ -96,4 +97,15 @@
 
 .piece-move {
   transition: transform 0.3s ease-in-out;
+}
+
+.player-indicator {
+  margin-bottom: 20px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 10px 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }

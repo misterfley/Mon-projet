@@ -1,18 +1,21 @@
-/* === Styles généraux pour le site === */
-
 body {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
   margin: 0;
   font-family: Arial, sans-serif;
   background-color: #f0f0f0;
 }
 
+/* Centrer uniquement le contenu principal */
+#thanos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: calc(100vh - 80px); /* Laisse de la place pour la navbar */
+  padding-top: 40px;
+}
+
 .navbar-brand img {
-  width: 2rem; /* Par exemple, 2rem pour la largeur */
+  width: 2rem;
   height: auto;
 }
 
@@ -37,32 +40,12 @@ body {
   color: white;
 }
 
-#thanos {
-  margin-top: 30px;
-  padding: 20px;
-}
-
 #thanos img {
-  width: 50%; /* Ajuste la taille de l'image à 50% de son conteneur */
+  width: 50%;
   height: auto;
 }
 
 #thanos h1 {
   font-size: 1.5rem;
   margin-top: 20px;
-}
-
-.fade-up {
-  animation: fadeInUp 0.6s ease-out forwards; /* Augmenter la durée à 0.6s */
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: scale(0.8) translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
 }
