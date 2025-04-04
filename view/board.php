@@ -90,7 +90,7 @@
       <div class="square dark" id="g1"><span class="white-piece">♘</span></div>
       <div class="square light" id="h1"><span class="white-piece">♖</span></div>
     </div>
-    <!-- autres éléments de  -->
+    <!-- messages -->
     <div id="game-status" style="display: none; color: red;"></div>
     <div id="game-message" style="display: none;"></div>
   </main>

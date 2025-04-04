@@ -11,19 +11,19 @@
 </head>
 
 <body>
-    <?php include("base.php");
-    include("message.php");
-    ?>
+    <?php include("base.php"); ?>
+    <?php include("message.php"); ?>
 
     <div class="container mt-5 text-center">
-        <h1 class="mb-4">Profil de <?php echo $_SESSION['nickname_player']; ?></h1>
+        <h1 class="mb-4">Profil de <?php echo htmlspecialchars($_SESSION['nickname_player']); ?></h1>
 
         <div class="card mx-auto" style="max-width: 400px;">
             <div class="card-body">
-                <img src="../public/img/uploads/ echo $_SESSION['image_player'] ?? 'default-avatar.png'; ?>" class="rounded-circle mb-3" width="120" alt="Photo de profil">
+                <img src="../public/img/uploads/<?php echo $_SESSION['image_player'] ?? 'default-avatar.png'; ?>" class="rounded-circle mb-3" width="120" alt="Photo de profil">
 
-                <h4><?php echo $_SESSION['firstname_player'] . ' ' . $_SESSION['lastname_player']; ?></h4>
-
+                <h4>
+                    <?php echo htmlspecialchars($_SESSION['firstname_player'] . ' ' . $_SESSION['lastname_player']); ?>
+                </h4>
 
                 <hr>
 

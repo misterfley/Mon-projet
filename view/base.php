@@ -5,8 +5,10 @@ if (session_status() === PHP_SESSION_NONE) {
 ?>
 <nav class="navbar navbar-expand-lg bg-dark navbar-dark">
     <div class="container">
-        <a class="navbar-brand" href="<?php echo isset($_SESSION['nickname_player']) ? 'game.php' : 'index.php'; ?>">
-            ECHECMANIA <img src="logo.png" alt="Logo" style="width: 30px;">
+
+        <a class="navbar-brand text-light d-flex align-items-center" href="<?php echo isset($_SESSION['nickname_player']) ? 'game.php' : 'index.php'; ?>">
+            <img src="../public/img/static/logo3.png" alt="Logo" style="height: 30px; width: auto;" class="me-2">
+            ECHECMANIA
         </a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
@@ -30,7 +32,7 @@ if (session_status() === PHP_SESSION_NONE) {
                 <?php else: ?>
                     <!-- Connecté -->
                     <li class="nav-item">
-                        <a class="nav-link" href="game.php">
+                        <a class="nav-link" href="board.php">
                             <h5>Jouer</h5>
                         </a>
                     </li>
@@ -46,8 +48,10 @@ if (session_status() === PHP_SESSION_NONE) {
                     </li>
                     <li class="nav-item d-flex align-items-center ms-3">
                         <a class="nav-link d-flex align-items-center" href="view/profile.php">
-                            <img src="../public/img/uploads/ echo $_SESSION['image_player'] ?? 'default-avatar.png'; ?>"
+                            <img src="../public/img/uploads/<?php echo $_SESSION['image_player'] ?? 'default-avatar.png'; ?>"
                                 class="rounded-circle me-2" width="35" height="35" alt="Avatar">
+
+
                             <span class="text-light"><?php echo htmlspecialchars($_SESSION['nickname_player']); ?></span>
                         </a>
                     </li>

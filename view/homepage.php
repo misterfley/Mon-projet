@@ -15,22 +15,24 @@
 <body>
 
     <?php include("base.php"); ?>
-    <?php include("message.php"); ?> <!-- Message toast -->
+    <?php include("message.php"); ?>
 
-    <div id="thanos" class="text-center">
-        <img src="popcorn2.png" class="img-fluid" alt="Popcorn" />
-        <h1 class="text-light">"Plongez dans l'univers des échecs, tout en vous amusant."</h1>
+    <div class="container text-center mt-5">
+
+        <?php if (!isset($_SESSION['nickname_player'])): ?>
+            <h2 class="text-light mb-4">Veuillez vous connecter.</h2>
+        <?php else: ?>
+            <h2 class="text-success mb-4">Bienvenue, <?php echo htmlspecialchars($_SESSION['nickname_player']); ?> !</h2>
+        <?php endif; ?>
+
+        <img src="../public/img/static/logo2.png" class="img-fluid mb-4 logo-home-animated" alt="Logo Echecs" style="max-width: 400px;">
+
+
+
+        <h4 class="text-muted mt-3">"Plongez dans l'univers des échecs, tout en vous amusant."</h4>
     </div>
 
-    <h1 class="text-center mt-5">
-        <?php
-        if (isset($_SESSION['name'])) {
-            echo "Bienvenue, " . $_SESSION['name'] . "!";
-        } else {
-            echo "Veuillez vous connecter.";
-        }
-        ?>
-    </h1>
+
 
 </body>
 

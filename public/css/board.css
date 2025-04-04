@@ -1,7 +1,7 @@
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: scale(0.8) translateY(30px);
+    transform: scale(0.9) translateY(20px);
   }
   to {
     opacity: 1;
@@ -13,7 +13,6 @@
   animation: fadeInUp 0.6s ease-out forwards;
 }
 
-/* Ne s'applique qu'à board.php */
 body.board-page {
   background-color: #f0f0f0;
   margin: 0;
@@ -38,9 +37,9 @@ body.board-page {
   grid-template-rows: repeat(8, 60px);
   width: 480px;
   height: 480px;
-  border: 4px solid #4b371c;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
   background-color: #8b5a2b;
+  box-shadow: inset 0 0 0 4px #4b371c;
+  margin: 0 auto;
   position: relative;
 }
 
@@ -63,16 +62,13 @@ body.board-page {
 }
 
 .square.selected {
-  outline: 3px solid #ffa726;
-  background-color: #ffe0b3;
+  background-color: #ffe082;
+  box-shadow: inset 0 0 0 3px #ff9800;
 }
 
 .square.valid-move {
-  background-color: #fdd835;
-  border: 3px solid #fbc02d;
-  cursor: pointer;
-  transition: background-color 0.2s, border 0.2s;
-  box-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+  background-color: #d4edda;
+  box-shadow: inset 0 0 0 3px #28a745;
 }
 
 .square.highlight {
@@ -81,8 +77,10 @@ body.board-page {
 }
 
 .square:hover {
-  opacity: 0.8;
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: #e4b400;
+  box-shadow: inset 0 0 0 2px #d49b00;
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s;
 }
 
 .white-piece {
@@ -108,4 +106,29 @@ body.board-page {
   padding: 10px 15px;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+#game-message {
+  margin-top: 30px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.95);
+  color: #333;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  display: none;
+}
+
+#game-message.fade-up {
+  display: block;
+  animation: fadeInUp 0.4s ease-out;
+}
+
+.square:focus {
+  outline: none;
 }
