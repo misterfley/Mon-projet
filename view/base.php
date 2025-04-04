@@ -3,42 +3,55 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 ?>
-<nav class="navbar navbar-expand-lg bg-dark">
+<nav class="navbar navbar-expand-lg bg-dark navbar-dark">
     <div class="container">
-        <a class="navbar-brand text-light" href="<?php echo isset($_SESSION['nickname_player']) ? 'game.php' : 'index.php'; ?>">
-            ECHECMANIA <img src="logo.png" alt="Logo">
+        <a class="navbar-brand" href="<?php echo isset($_SESSION['nickname_player']) ? 'game.php' : 'index.php'; ?>">
+            ECHECMANIA <img src="logo.png" alt="Logo" style="width: 30px;">
         </a>
+
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                <?php if (!isset($_SESSION['nickname_player'])) { ?>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+            <ul class="navbar-nav align-items-center">
+                <?php if (!isset($_SESSION['nickname_player'])): ?>
                     <!-- Non connecté -->
                     <li class="nav-item">
-                        <a class="nav-link text-light" href="add_user_form.php">
+                        <a class="nav-link" href="add_user_form.php">
                             <h5>Inscription</h5>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-light" href="login.php">
+                        <a class="nav-link" href="login.php">
                             <h5>Connexion</h5>
                         </a>
                     </li>
-                <?php } else { ?>
+                <?php else: ?>
                     <!-- Connecté -->
                     <li class="nav-item">
-                        <a class="nav-link text-light" href="board.php">
+                        <a class="nav-link" href="game.php">
                             <h5>Jouer</h5>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-light" href="../controller/logout_controller.php">
+                        <a class="nav-link" href="profile.php">
+                            <h5>Profil</h5>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../controller/logout_controller.php">
                             <h5>Déconnexion</h5>
                         </a>
                     </li>
-                <?php } ?>
+                    <li class="nav-item d-flex align-items-center ms-3">
+                        <a class="nav-link d-flex align-items-center" href="view/profile.php">
+                            <img src="../public/img/uploads/ echo $_SESSION['image_player'] ?? 'default-avatar.png'; ?>"
+                                class="rounded-circle me-2" width="35" height="35" alt="Avatar">
+                            <span class="text-light"><?php echo htmlspecialchars($_SESSION['nickname_player']); ?></span>
+                        </a>
+                    </li>
+                <?php endif; ?>
             </ul>
         </div>
     </div>

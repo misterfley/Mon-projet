@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Supprimer toutes les variables de session
 $_SESSION = [];
 
 if (ini_get("session.use_cookies")) {
@@ -19,6 +18,5 @@ if (ini_get("session.use_cookies")) {
 
 session_destroy();
 
-// Rediriger avec un message
 header("Location: ../view/homepage.php?message=Déconnexion réussie&status=success");
 exit();

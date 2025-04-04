@@ -7,8 +7,6 @@ include("message.php"); ?>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Inscription</title>
-
-    <!-- Styles -->
     <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="../node_modules/bootstrap-icons/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../public/css/style.css">
@@ -19,8 +17,6 @@ include("message.php"); ?>
 
     <div class="container my-4">
         <h1 class="text-center text-primary">Inscription</h1>
-
-        <!-- Message d'alerte -->
         <?php if (isset($_GET['message']) && isset($_GET['status'])): ?>
             <div class="alert alert-<?php echo $_GET['status']; ?> text-center" role="alert">
                 <?php echo htmlspecialchars($_GET['message'], ENT_QUOTES, 'UTF-8'); ?>

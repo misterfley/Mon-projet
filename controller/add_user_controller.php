@@ -1,8 +1,5 @@
 <?php
-
-include "pdo.php"; // Connexion à la base de données
-
-// Vérifier si tous les champs du formulaire sont remplis
+include "pdo.php";
 if (
     !empty($_POST['firstname_player']) &&
     !empty($_POST['lastname_player']) &&
@@ -10,31 +7,21 @@ if (
     !empty($_POST['email_player']) &&
     !empty($_POST['password_player'])
 ) {
-
-    // Validation de l'email
     if (!filter_var($_POST['email_player'], FILTER_VALIDATE_EMAIL)) {
         header("Location: ../view/add_user_form.php?message=Email invalide&status=error");
         exit();
     }
-
-    // Hashage du mot de passe
     $psw = password_hash($_POST["password_player"], PASSWORD_ARGON2I);
-
-    // Vérification de l'image téléchargée
     if (isset($_FILES['image_player']) && $_FILES['image_player']['error'] === UPLOAD_ERR_OK) {
-
         $fileName = $_FILES["image_player"]["name"];
         $fileSize = $_FILES["image_player"]["size"];
         $tmpName = $_FILES["image_player"]["tmp_name"];
         $tabExtension = explode('.', $fileName);
         $extension = strtolower(end($tabExtension));
         $validExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
-
         if (in_array($extension, $validExtensions)) {
             if ($fileSize < 2097152) { // Taille inférieure à 2 Mo
-
                 $newName = sha1(uniqid(mt_rand(), true)) . $_POST['firstname_player'] . '_' . $_POST['lastname_player'] . '.' . $extension;
-
                 try {
                     $success = move_uploaded_file($tmpName, "../public/img/uploads/" . $newName);
                 } catch (Exception $e) {
@@ -42,9 +29,7 @@ if (
                     header("Location: ../view/add_user_form.php?message=$message_error&status=error");
                     exit();
                 }
-
                 if ($success) {
-                    // Insérer dans la base de données
                     $sql = "INSERT INTO player (firstname_player, lastname_player, nickname_player, email_player, password_player, image_player) 
                             VALUES (?,?,?,?,?,?)";
                     $stmt = $pdo->prepare($sql);
@@ -56,7 +41,6 @@ if (
                         $psw,
                         $newName
                     ]);
-
                     if ($verif) {
                         header("Location: ../view/login.php?message=Inscription réussie&status=success");
                         exit();
