@@ -3,14 +3,12 @@ body {
   font-family: Arial, sans-serif;
   background-color: #f0f0f0;
 }
-
-/* Centrer uniquement le contenu principal */
 #thanos {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: calc(100vh - 80px); /* Laisse de la place pour la navbar */
+  height: calc(100vh - 80px);
   padding-top: 40px;
 }
 

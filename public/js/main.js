@@ -459,3 +459,7 @@ function isValidCastlingMove(piece, fromFile, fromRank, toFile, toRank) {
 
   return false;
 }
+document.addEventListener("DOMContentLoaded", () => {
+  const squares = document.querySelectorAll(".square");
+  squares.forEach((square) => square.addEventListener("click", handleClick));
+});
