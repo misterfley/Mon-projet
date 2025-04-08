@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost:3306
--- Généré le : ven. 04 avr. 2025 à 13:33
+-- Généré le : lun. 07 avr. 2025 à 08:09
 -- Version du serveur : 8.0.41-0ubuntu0.22.04.1
 -- Version de PHP : 8.3.19
 
@@ -20,6 +20,29 @@ SET time_zone = "+00:00";
 --
 -- Base de données : `game`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `game`
+--
+
+CREATE TABLE `game` (
+  `id_game` int NOT NULL,
+  `player_white` int DEFAULT NULL,
+  `player_black` int DEFAULT NULL,
+  `current_board` text COLLATE utf8mb4_general_ci,
+  `turn` enum('white','black') COLLATE utf8mb4_general_ci DEFAULT 'white',
+  `status` enum('waiting','ongoing','finished') COLLATE utf8mb4_general_ci DEFAULT 'waiting',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `game`
+--
+
+INSERT INTO `game` (`id_game`, `player_white`, `player_black`, `current_board`, `turn`, `status`, `created_at`) VALUES
+(1, 1, 2, '{\"a1\":\"wr\",\"b1\":\"wn\",\"c1\":\"wb\",\"d1\":\"wq\",\"e1\":\"wk\",\"f1\":\"wb\",\"h1\":\"wr\",\"a2\":\"wp\",\"b2\":\"wp\",\"c2\":\"wp\",\"d2\":\"wp\",\"f2\":\"wp\",\"g2\":\"wp\",\"h2\":\"wp\",\"a7\":\"bp\",\"b7\":\"bp\",\"c7\":\"bp\",\"d7\":\"bp\",\"g7\":\"bp\",\"h7\":\"bp\",\"a8\":\"br\",\"b8\":\"bn\",\"c8\":\"bb\",\"d8\":\"bq\",\"e8\":\"bk\",\"f8\":\"bb\",\"g8\":\"bn\",\"h8\":\"br\",\"e4\":\"wp\",\"e5\":\"bp\",\"f3\":\"wn\",\"f5\":\"bp\"}', 'white', 'waiting', '2025-04-07 07:58:50');
 
 -- --------------------------------------------------------
 
@@ -52,6 +75,12 @@ INSERT INTO `player` (`id_player`, `firstname_player`, `lastname_player`, `nickn
 --
 
 --
+-- Index pour la table `game`
+--
+ALTER TABLE `game`
+  ADD PRIMARY KEY (`id_game`);
+
+--
 -- Index pour la table `player`
 --
 ALTER TABLE `player`
@@ -61,6 +90,12 @@ ALTER TABLE `player`
 --
 -- AUTO_INCREMENT pour les tables déchargées
 --
+
+--
+-- AUTO_INCREMENT pour la table `game`
+--
+ALTER TABLE `game`
+  MODIFY `id_game` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT pour la table `player`

@@ -25,13 +25,23 @@ const pieceUnicodeMap = {
   bp: "♟",
 };
 
+let playerColor = null;
+let currentTurn = "white";
+let selectedSquare = null;
+function rotateBoardIfNeeded() {
+  if (playerColor === "black") {
+    boardElement.style.transform = "rotate(180deg)";
+    document.querySelectorAll(".square").forEach((square) => {
+      square.style.transform = "rotate(180deg)";
+    });
+  }
+}
+
 function renderBoard(boardData) {
-  // Efface toutes les pièces
   document.querySelectorAll(".square").forEach((square) => {
-    square.innerHTML = ""; // on efface tout dans les cases
+    square.innerHTML = "";
   });
 
-  // Ajoute les pièces depuis le JSON
   for (const squareId in boardData) {
     const pieceCode = boardData[squareId];
     const square = document.getElementById(squareId);
@@ -57,6 +67,13 @@ function getGameState() {
 
       renderBoard(data.board);
       updateTurnIndicator(data.turn);
+      currentTurn = data.turn;
+
+      // Une seule fois : on définit la couleur du joueur et on tourne l'échiquier si besoin
+      if (!playerColor && data.player_color) {
+        playerColor = data.player_color;
+        rotateBoardIfNeeded();
+      }
     })
     .catch((err) => {
       console.error("Erreur AJAX :", err);
@@ -70,44 +87,53 @@ function updateTurnIndicator(turn) {
   }
 }
 
-// Rafraîchit toutes les 2 secondes
-setInterval(getGameState, 2000);
-
-// Appel initial
-getGameState();
-let selectedSquare = null;
-
 document.querySelectorAll(".square").forEach((square) => {
   square.addEventListener("click", () => {
     const piece = square.querySelector("span");
 
+    // Si un pion est déjà sélectionné
     if (selectedSquare && selectedSquare !== square) {
       const from = selectedSquare.id;
       const to = square.id;
 
-      // Envoie le coup au serveur
       fetch("../controller/move_controller.php", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
         body: `game_id=${gameId}&from=${from}&to=${to}`,
       })
         .then((res) => res.json())
         .then((data) => {
           if (data.success) {
-            getGameState(); // Rafraîchir l’échiquier
             selectedSquare.classList.remove("selected");
             selectedSquare = null;
+            getGameState();
           } else {
             alert(data.error);
             selectedSquare.classList.remove("selected");
             selectedSquare = null;
           }
         });
-    } else if (piece) {
-      // Sélection initiale
+
+      return;
+    }
+
+    // Si aucune pièce n'est sélectionnée, on en sélectionne une
+    if (piece) {
+      const isWhite = piece.classList.contains("white-piece");
+      const pieceColor = isWhite ? "white" : "black";
+
+      if (pieceColor !== playerColor) return; // pas ta couleur
+      if (playerColor !== currentTurn) return; // pas ton tour
+
       if (selectedSquare) selectedSquare.classList.remove("selected");
       selectedSquare = square;
-      square.classList.add("selected");
+      selectedSquare.classList.add("selected");
     }
   });
 });
+
+// Rafraîchit automatiquement toutes les 2 secondes
+setInterval(getGameState, 2000);
+getGameState(); // initial

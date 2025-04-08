@@ -32,9 +32,10 @@ if (session_status() === PHP_SESSION_NONE) {
                 <?php else: ?>
                     <!-- Connecté -->
                     <li class="nav-item">
-                        <a class="nav-link" href="board.php">
+                        <a class="nav-link" href="play.php">
                             <h5>Jouer</h5>
                         </a>
+
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="profile.php">
