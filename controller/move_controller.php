@@ -109,4 +109,8 @@ $update->execute([
     $gameId
 ]);
 
-echo json_encode(['success' => true, 'new_turn' => $newTurn]);
+echo json_encode([
+    'success' => true,
+    'new_turn' => $newTurn,
+    'board' => $board
+]);

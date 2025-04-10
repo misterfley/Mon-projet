@@ -101,11 +101,12 @@ if (!isset($_SESSION['user_id'])) {
 
   </main>
   <script src="../public/js/chess_rules.js"></script>
-  <?php if ($_GET['mode'] === 'multi'): ?>
+  <?php if (isset($_GET['mode']) && $_GET['mode'] === 'multi'): ?>
     <script src="../public/js/multiplayer.js"></script>
   <?php else: ?>
     <script src="../public/js/main.js"></script>
   <?php endif; ?>
+
 </body>
 
 </html>

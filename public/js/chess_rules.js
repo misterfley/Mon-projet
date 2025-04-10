@@ -25,19 +25,44 @@ function getPieceType(piece) {
 }
 
 function isPathClear(fromFile, fromRank, toFile, toRank) {
+  if (fromFile === toFile && fromRank === toRank) return true;
+
   let fileStep = fromFile < toFile ? 1 : fromFile > toFile ? -1 : 0;
   let rankStep = fromRank < toRank ? 1 : fromRank > toRank ? -1 : 0;
+
   let file = fromFile.charCodeAt(0) + fileStep;
   let rank = fromRank + rankStep;
 
+  console.log(`[DEBUG PATH] from ${fromFile}${fromRank} to ${toFile}${toRank}`);
+
   while (file !== toFile.charCodeAt(0) || rank !== toRank) {
-    let square = document.getElementById(String.fromCharCode(file) + rank);
-    if (!square || square.querySelector("span")) return false;
+    if (
+      file < "a".charCodeAt(0) ||
+      file > "h".charCodeAt(0) ||
+      rank < 1 ||
+      rank > 8
+    ) {
+      console.warn(
+        `[PATH ERROR] Coordonnée hors échiquier : ${String.fromCharCode(
+          file
+        )}${rank}`
+      );
+      return false;
+    }
+
+    const coord = `${String.fromCharCode(file)}${rank}`;
+    let square = document.getElementById(coord);
+    const occupied = square?.querySelector("span");
+    console.log(` → ${coord} ${occupied ? "bloqué" : "libre"}`);
+    if (occupied) return false;
+
     file += fileStep;
     rank += rankStep;
   }
+
   return true;
 }
+
 //gestion deplacements
 function isValidMove(piece, fromSquare, toSquare) {
   if (!piece) return false;
@@ -49,6 +74,11 @@ function isValidMove(piece, fromSquare, toSquare) {
   const toFile = toId[0],
     toRank = parseInt(toId[1], 10);
   const targetPiece = toSquare.querySelector("span");
+
+  // ⚠️ Les rois ne peuvent pas s'attaquer
+  if (pieceType === "king" && getPieceType(targetPiece) === "king") {
+    return false;
+  }
 
   if (targetPiece && getPieceColor(targetPiece) === getPieceColor(piece))
     return false;
@@ -174,42 +204,62 @@ function isKingInCheckAfterMove(fromSquare, toSquare, color) {
   return kingInCheck;
 }
 
-function isKingInCheck(color) {
-  const kingSquare = [...document.querySelectorAll(".square")].find(
-    (square) => {
-      const piece = square.querySelector("span");
-      return (
-        piece &&
-        getPieceColor(piece) === color &&
-        getPieceType(piece) === "king"
-      );
-    }
-  );
-
-  if (!kingSquare) return false;
-
-  const inCheck = [...document.querySelectorAll(".square")].some((square) => {
-    const piece = square.querySelector("span");
-    return (
-      piece &&
-      getPieceColor(piece) !== color &&
-      isValidMove(piece, square, kingSquare)
-    );
-  });
-
-  console.log(
-    `[CHECK DEBUG] Roi ${color} en ${kingSquare.id} — ${
-      inCheck ? "ÉCHEC" : "OK"
-    }`
-  );
-
-  return inCheck;
-}
-
 //gestion interactions joueur
 function handleClick(e) {
   const square = e.target.closest(".square");
   if (!square) return;
+  function isKingInCheck(color) {
+    const kingSquare = [...document.querySelectorAll(".square")].find(
+      (square) => {
+        const piece = square.querySelector("span");
+        return (
+          piece &&
+          getPieceColor(piece) === color &&
+          getPieceType(piece) === "king"
+        );
+      }
+    );
+
+    if (!kingSquare) {
+      console.warn(`[CHECK] Aucun roi trouvé pour ${color}`);
+      return false;
+    }
+
+    console.log(
+      `[CHECK] Recherche des attaquants pour le roi ${color} en ${kingSquare.id}`
+    );
+
+    const allSquares = [...document.querySelectorAll(".square")];
+
+    const attackers = allSquares.filter((square) => {
+      const piece = square.querySelector("span");
+
+      if (
+        piece &&
+        getPieceColor(piece) !== color &&
+        isValidMove(piece, square, kingSquare)
+      ) {
+        console.log(
+          `[ATTAQUE] ${piece.textContent} (${square.id}) menace le roi en ${kingSquare.id}`
+        );
+        return true;
+      }
+
+      return false;
+    });
+
+    if (attackers.length === 0) {
+      console.log(`[CHECK DEBUG] Aucun attaquant détecté pour le roi ${color}`);
+      return false;
+    }
+
+    console.warn(
+      `[CHECK DEBUG] ${color} king on ${kingSquare.id} | Attaquants :`,
+      attackers.map((s) => `${s.id}=${s.querySelector("span")?.textContent}`)
+    );
+
+    return true;
+  }
 
   console.log(`Case cliquée: ${square.id}`);
 
