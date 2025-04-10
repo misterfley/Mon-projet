@@ -98,10 +98,10 @@ function getGameState() {
       }
 
       // On attend une frame + 50ms pour s'assurer que le DOM est bien prêt
-      const justMoved = currentTurn === "white" ? "black" : "white";
+
       setTimeout(() => {
         requestAnimationFrame(() => {
-          checkGameStatus(justMoved);
+          checkGameStatus(currentTurn); // ← on vérifie le roi du joueur qui va jouer
         });
       }, 50);
     })
@@ -116,101 +116,100 @@ function updateTurnIndicator(turn) {
     indicator.textContent = `${turn === "white" ? "Blanc" : "Noir"} joue`;
   }
 }
-
 document.querySelectorAll(".square").forEach((square) => {
-  square.addEventListener("click", () => {
-    const piece = square.querySelector("span");
+  square.addEventListener("click", (e) => {
+    const targetSquare = e.currentTarget; // ← assure que c’est la case cliquée (pas le span)
+    const piece = targetSquare.querySelector("span");
 
-    // Si un pion est déjà sélectionné
-    if (selectedSquare && selectedSquare !== square) {
+    // 🟢 Re-clic sur la case déjà sélectionnée → désélection
+    if (selectedSquare === targetSquare) {
+      selectedSquare.classList.remove("selected");
+      selectedSquare = null;
+      console.log("Désélection via re-clic sur la même case");
+      return;
+    }
+
+    // 🎯 Si une pièce est déjà sélectionnée, tentative de déplacement
+    if (selectedSquare && selectedSquare !== targetSquare) {
       const from = selectedSquare.id;
-      const to = square.id;
-
+      const to = targetSquare.id;
       const movingPiece = selectedSquare.querySelector("span");
 
       if (!movingPiece) return;
 
-      // Vérifie la validité du déplacement AVANT l’envoi
-      if (!isValidMove(movingPiece, selectedSquare, square)) {
-        showMessage("Mouvement invalide.");
-        selectedSquare.classList.remove("selected");
-        selectedSquare = null;
-        return;
-      }
-      // En multijoueur, on saute la vérif JS pour le roque
-      const isCastling =
-        getPieceType(movingPiece) === "king" &&
-        Math.abs(from[0].charCodeAt(0) - to[0].charCodeAt(0)) === 2;
+      if (isValidMove(movingPiece, selectedSquare, targetSquare)) {
+        if (
+          typeof isKingInCheckAfterMove === "function" &&
+          isKingInCheckAfterMove(selectedSquare, targetSquare, playerColor)
+        ) {
+          showMessage("Impossible : ce coup vous met en échec !");
+          selectedSquare.classList.remove("selected");
+          selectedSquare = null;
+          getGameState();
+          return;
+        }
 
-      // En multijoueur, on ne vérifie pas localement si le roi est en échec après un coup.
-      // On laisse le serveur décider.
-
-      // Si tout est bon, envoie le coup au serveur
-      // Si tout est bon, envoie le coup au serveur
-      // Empêche un coup qui laisserait le roi en échec
-      if (isKingInCheckAfterMove(selectedSquare, square, playerColor)) {
-        showMessage("Impossible : ce coup vous met en échec !");
-        selectedSquare.classList.remove("selected");
-        selectedSquare = null;
-        return;
-      }
-
-      fetch("../controller/move_controller.php", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: `game_id=${gameId}&from=${from}&to=${to}`,
-      })
-        .then((res) => res.text())
-        .then((data) => {
-          console.log("Réponse brute du serveur : ", data);
-          try {
-            const jsonResponse = JSON.parse(data);
-            if (jsonResponse.success) {
-              selectedSquare.classList.remove("selected");
-              selectedSquare = null;
-
-              getGameStateWithCallback(() => {
-                const justMoved = currentTurn === "white" ? "black" : "white";
-                setTimeout(() => {
-                  checkGameStatus(justMoved);
-                }, 2000); // ← 2 seconde de délai pour s'assurer du rendu DOM
-              });
-            } else {
-              alert(jsonResponse.error);
-              selectedSquare.classList.remove("selected");
-              selectedSquare = null;
-            }
-          } catch (error) {
-            console.error("Erreur de parsing JSON :", error);
-            alert(
-              "Une erreur est survenue : La réponse du serveur n'est pas au format attendu."
-            );
-          }
+        // ✅ Envoie au serveur
+        fetch("../controller/move_controller.php", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: `game_id=${gameId}&from=${from}&to=${to}`,
         })
+          .then((res) => res.text())
+          .then((data) => {
+            console.log("Réponse brute du serveur : ", data);
+            try {
+              const jsonResponse = JSON.parse(data);
+              if (jsonResponse.success) {
+                selectedSquare.classList.remove("selected");
+                selectedSquare = null;
+                getGameStateWithCallback((justMoved) => {
+                  checkGameStatus(justMoved);
+                });
+              } else {
+                alert(jsonResponse.error);
+                selectedSquare.classList.remove("selected");
+                selectedSquare = null;
+                getGameState();
+              }
+            } catch (error) {
+              console.error("Erreur de parsing JSON :", error);
+              alert("Une erreur est survenue.");
+              getGameState();
+            }
+          })
+          .catch((err) => {
+            console.error("Erreur AJAX :", err);
+          });
 
-        .catch((err) => {
-          console.error("Erreur AJAX :", err);
-        });
-
-      return;
+        return;
+      } else {
+        // Mouvement invalide
+        selectedSquare.classList.remove("selected");
+        selectedSquare = null;
+        return;
+      }
     }
 
-    // Si aucune pièce n'est sélectionnée, on en sélectionne une
+    // 🟢 Sélection d’une pièce jouable
     if (piece) {
       const isWhite = piece.classList.contains("white-piece");
       const pieceColor = isWhite ? "white" : "black";
 
-      if (pieceColor !== playerColor) return; // pas ta couleur
-      if (playerColor !== currentTurn) return; // pas ton tour
+      if (pieceColor !== playerColor || playerColor !== currentTurn) {
+        return; // pas ta pièce ou pas ton tour
+      }
 
       if (selectedSquare) selectedSquare.classList.remove("selected");
-      selectedSquare = square;
+      selectedSquare = targetSquare;
       selectedSquare.classList.add("selected");
+      console.log("Nouvelle sélection");
     }
   });
 });
+
 function showMessage(message) {
   const box = document.getElementById("game-message");
   if (!box) return;
@@ -247,6 +246,7 @@ function getGameStateWithCallback(callback) {
         );
       }, 100);
 
+      const previousTurn = currentTurn;
       updateTurnIndicator(data.turn);
       currentTurn = data.turn;
 
@@ -256,7 +256,8 @@ function getGameStateWithCallback(callback) {
       }
 
       if (typeof callback === "function") {
-        callback(); // Appelle la vérification des règles après update
+        const justMoved = previousTurn; // ← le tour d'avant
+        callback(justMoved);
       }
     })
     .catch((err) => {
@@ -264,6 +265,8 @@ function getGameStateWithCallback(callback) {
     });
 }
 function checkGameStatus(color) {
+  console.log(`[STATUT] Vérification pour le roi ${color}`);
+
   requestAnimationFrame(() => {
     setTimeout(() => {
       const gameStatusMessage = document.getElementById("game-status");

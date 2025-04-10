@@ -66,6 +66,7 @@ function isPathClear(fromFile, fromRank, toFile, toRank) {
 //gestion deplacements
 function isValidMove(piece, fromSquare, toSquare) {
   if (!piece) return false;
+
   const pieceType = getPieceType(piece);
   const fromId = fromSquare.id,
     toId = toSquare.id;
@@ -75,13 +76,15 @@ function isValidMove(piece, fromSquare, toSquare) {
     toRank = parseInt(toId[1], 10);
   const targetPiece = toSquare.querySelector("span");
 
-  // ⚠️ Les rois ne peuvent pas s'attaquer
+  // Les rois ne peuvent pas s'attaquer entre eux
   if (pieceType === "king" && getPieceType(targetPiece) === "king") {
     return false;
   }
 
-  if (targetPiece && getPieceColor(targetPiece) === getPieceColor(piece))
+  // Interdit de capturer ses propres pièces
+  if (targetPiece && getPieceColor(targetPiece) === getPieceColor(piece)) {
     return false;
+  }
 
   switch (pieceType) {
     case "pawn":
@@ -99,21 +102,30 @@ function isValidMove(piece, fromSquare, toSquare) {
 
     case "knight":
       return isValidKnightMove(fromFile, fromRank, toFile, toRank);
+
     case "bishop":
       return isValidBishopMove(fromFile, fromRank, toFile, toRank);
+
     case "queen":
       return isValidQueenMove(fromFile, fromRank, toFile, toRank);
+
     case "king":
-      if (Math.abs(toFile.charCodeAt(0) - fromFile.charCodeAt(0)) === 2) {
-        // En multijoueur, on laisse le serveur valider le roque
-        return true;
+      const fileDiff = Math.abs(toFile.charCodeAt(0) - fromFile.charCodeAt(0));
+      const rankDiff = Math.abs(toRank - fromRank);
+
+      // Autorise le roque : déplacement horizontal de 2 cases sans changement de rang
+      if (fileDiff === 2 && rankDiff === 0) {
+        return true; // on laisse le serveur vérifier les règles complètes du roque
       }
+
+      // Tout autre mouvement : déplacement classique du roi
       return isValidKingMove(fromFile, fromRank, toFile, toRank);
 
     default:
       return false;
   }
 }
+
 function isValidRookMove(fromFile, fromRank, toFile, toRank) {
   return (
     (fromFile === toFile || fromRank === toRank) &&
@@ -188,7 +200,70 @@ function isValidPawnMove(
 
   return false;
 }
+function isKingInCheck(color) {
+  const kingSquare = [...document.querySelectorAll(".square")].find(
+    (square) => {
+      const piece = square.querySelector("span");
+      return (
+        piece &&
+        getPieceColor(piece) === color &&
+        getPieceType(piece) === "king"
+      );
+    }
+  );
 
+  if (!kingSquare) {
+    console.warn(`[CHECK] Aucun roi trouvé pour ${color}`);
+    return false;
+  }
+
+  console.log(
+    `[CHECK] Recherche des attaquants pour le roi ${color} en ${kingSquare.id}`
+  );
+
+  const allSquares = [...document.querySelectorAll(".square")];
+
+  const attackers = allSquares.filter((square) => {
+    const piece = square.querySelector("span");
+
+    if (
+      piece &&
+      getPieceColor(piece) !== color &&
+      isValidMove(piece, square, kingSquare)
+    ) {
+      console.log(
+        `[ATTAQUE] ${piece.textContent} (${square.id}) menace le roi en ${kingSquare.id}`
+      );
+      return true;
+    }
+
+    return false;
+  });
+
+  if (attackers.length === 0) {
+    console.log(`[CHECK DEBUG] Aucun attaquant détecté pour le roi ${color}`);
+    console.log(`[CHECK DEBUG] Etat des pièces adverses :`);
+
+    allSquares.forEach((sq) => {
+      const p = sq.querySelector("span");
+      if (p && getPieceColor(p) !== color) {
+        console.log(
+          `[ATTAQUE ?] ${p.textContent} (${sq.id}) → vers roi en ${kingSquare.id}`
+        );
+        console.log(" → Mouvement valide ?", isValidMove(p, sq, kingSquare));
+      }
+    });
+
+    return false;
+  }
+
+  console.warn(
+    `[CHECK DEBUG] ${color} king on ${kingSquare.id} | Attaquants :`,
+    attackers.map((s) => `${s.id}=${s.querySelector("span")?.textContent}`)
+  );
+
+  return true;
+}
 function isKingInCheckAfterMove(fromSquare, toSquare, color) {
   //Sauvegarde l'état initial
   const tempContent = toSquare.innerHTML;
@@ -208,58 +283,6 @@ function isKingInCheckAfterMove(fromSquare, toSquare, color) {
 function handleClick(e) {
   const square = e.target.closest(".square");
   if (!square) return;
-  function isKingInCheck(color) {
-    const kingSquare = [...document.querySelectorAll(".square")].find(
-      (square) => {
-        const piece = square.querySelector("span");
-        return (
-          piece &&
-          getPieceColor(piece) === color &&
-          getPieceType(piece) === "king"
-        );
-      }
-    );
-
-    if (!kingSquare) {
-      console.warn(`[CHECK] Aucun roi trouvé pour ${color}`);
-      return false;
-    }
-
-    console.log(
-      `[CHECK] Recherche des attaquants pour le roi ${color} en ${kingSquare.id}`
-    );
-
-    const allSquares = [...document.querySelectorAll(".square")];
-
-    const attackers = allSquares.filter((square) => {
-      const piece = square.querySelector("span");
-
-      if (
-        piece &&
-        getPieceColor(piece) !== color &&
-        isValidMove(piece, square, kingSquare)
-      ) {
-        console.log(
-          `[ATTAQUE] ${piece.textContent} (${square.id}) menace le roi en ${kingSquare.id}`
-        );
-        return true;
-      }
-
-      return false;
-    });
-
-    if (attackers.length === 0) {
-      console.log(`[CHECK DEBUG] Aucun attaquant détecté pour le roi ${color}`);
-      return false;
-    }
-
-    console.warn(
-      `[CHECK DEBUG] ${color} king on ${kingSquare.id} | Attaquants :`,
-      attackers.map((s) => `${s.id}=${s.querySelector("span")?.textContent}`)
-    );
-
-    return true;
-  }
 
   console.log(`Case cliquée: ${square.id}`);
 
@@ -310,11 +333,19 @@ function handleClick(e) {
       selectedSquare.classList.remove("selected");
       selectedSquare = null;
     }
-  } else if (piece && getPieceColor(piece) === currentPlayer) {
-    console.log("Sélection de la pièce");
+  } else {
     if (selectedSquare) selectedSquare.classList.remove("selected");
-    selectedSquare = square;
-    selectedSquare.classList.add("selected");
+
+    // Si la case contient une pièce jouable, on la sélectionne
+    if (piece && getPieceColor(piece) === currentPlayer) {
+      selectedSquare = square;
+      selectedSquare.classList.add("selected");
+      console.log("Nouvelle sélection");
+    } else {
+      // Sinon on annule la sélection
+      selectedSquare = null;
+      console.log("Aucune sélection possible");
+    }
   }
 }
 

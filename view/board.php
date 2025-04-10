@@ -91,10 +91,7 @@ if (!isset($_SESSION['user_id'])) {
       }
       ?>
     </div>
-    <div id="end-buttons" style="display: none; margin-top: 20px;" class="text-center">
-      <button id="replay-btn" class="btn btn-success me-2">Rejouer</button>
-      <a href="play.php" class="btn btn-secondary">Retour au menu</a>
-    </div>
+
 
     <div id="game-status" style="display: none; color: red;"></div>
     <div id="game-message" style="display: none;"></div>
@@ -106,6 +103,7 @@ if (!isset($_SESSION['user_id'])) {
   <?php else: ?>
     <script src="../public/js/main.js"></script>
   <?php endif; ?>
+
 
 </body>
 
