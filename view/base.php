@@ -6,7 +6,7 @@ if (session_status() === PHP_SESSION_NONE) {
 <nav class="navbar navbar-expand-lg bg-dark navbar-dark">
     <div class="container">
 
-        <a class="navbar-brand text-light d-flex align-items-center" href="<?php echo isset($_SESSION['nickname_player']) ? 'game.php' : 'index.php'; ?>">
+        <a class="navbar-brand text-light d-flex align-items-center" href="<?php echo isset($_SESSION['nickname_player']) ? 'game.php' : '../index.php'; ?>">
             <img src="../public/img/static/logo3.png" alt="Logo" style="height: 30px; width: auto;" class="me-2">
             ECHECMANIA
         </a>

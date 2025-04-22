@@ -20,7 +20,7 @@
     <div class="container text-center mt-5">
 
         <?php if (!isset($_SESSION['nickname_player'])): ?>
-            <h2 class="text-light mb-4">Veuillez vous connecter.</h2>
+            <h2 class="text-light mb-4">Identifie-toi pour entrer dans la partie.</h2>
         <?php else: ?>
             <h2 class="text-success mb-4">Bienvenue, <?php echo htmlspecialchars($_SESSION['nickname_player']); ?> !</h2>
         <?php endif; ?>
@@ -29,7 +29,8 @@
 
 
 
-        <h4 class="text-muted mt-3">"Plongez dans l'univers des échecs, tout en vous amusant."</h4>
+        <h4 class="text-muted mt-3">"Connecté. Stratégique. Addictif,</h4>
+        <h4 class="text-muted mt-3">Rejoins la ChessMania, là où les pions deviennent rois."</h4>
     </div>
 
 

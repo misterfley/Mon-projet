@@ -63,7 +63,7 @@ function renderBoard(boardData) {
     }
   }
 
-  // ✅ Debug : vérifie le nombre de rois blancs et noirs affichés après rendu
+  // Debug : vérifie nombre de rois blancs et noirs affichés après rendu
   const allSpans = [...document.querySelectorAll(".square span")];
   const whiteKings = allSpans.filter((el) => el.textContent === "♔");
   const blackKings = allSpans.filter((el) => el.textContent === "♚");
@@ -97,7 +97,7 @@ function getGameState() {
         rotateBoardIfNeeded();
       }
 
-      // On attend une frame + 50ms pour s'assurer que le DOM est bien prêt
+      // On attend  pour s'assurer que le DOM est bien prêt
 
       setTimeout(() => {
         requestAnimationFrame(() => {
@@ -121,7 +121,7 @@ document.querySelectorAll(".square").forEach((square) => {
     const targetSquare = e.currentTarget; // ← assure que c’est la case cliquée (pas le span)
     const piece = targetSquare.querySelector("span");
 
-    // 🟢 Re-clic sur la case déjà sélectionnée → désélection
+    //  Re-clic sur la case déjà sélectionnée → désélection
     if (selectedSquare === targetSquare) {
       selectedSquare.classList.remove("selected");
       selectedSquare = null;
@@ -129,7 +129,7 @@ document.querySelectorAll(".square").forEach((square) => {
       return;
     }
 
-    // 🎯 Si une pièce est déjà sélectionnée, tentative de déplacement
+    //  Si une pièce est déjà sélectionnée, tentative de déplacement
     if (selectedSquare && selectedSquare !== targetSquare) {
       const from = selectedSquare.id;
       const to = targetSquare.id;
@@ -149,7 +149,7 @@ document.querySelectorAll(".square").forEach((square) => {
           return;
         }
 
-        // ✅ Envoie au serveur
+        //  Envoie au serveur
         fetch("../controller/move_controller.php", {
           method: "POST",
           headers: {
@@ -193,7 +193,7 @@ document.querySelectorAll(".square").forEach((square) => {
       }
     }
 
-    // 🟢 Sélection d’une pièce jouable
+    //  Sélection d’une pièce jouable
     if (piece) {
       const isWhite = piece.classList.contains("white-piece");
       const pieceColor = isWhite ? "white" : "black";
