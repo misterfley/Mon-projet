@@ -1,3 +1,7 @@
+function handleClick(e) {
+  const square = e.target.closest(".square");
+  if (!square) return;
+}
 function getPieceColor(piece) {
   if (!piece) return null;
   if (piece.classList.contains("white-piece")) return "white";
@@ -378,7 +382,7 @@ function updatePlayerIndicator() {
   }'s turn`;
   setTimeout(() => indicator.classList.remove("fade-up"), 500);
 }
-squares.forEach((square) => square.addEventListener("click", handleClick));
+
 function updateCastlingRights(movingPiece, fromSquare) {
   const pieceType = getPieceType(movingPiece);
   const color = getPieceColor(movingPiece);

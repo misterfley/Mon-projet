@@ -32,7 +32,7 @@ if (!isset($_SESSION['user_id'])) {
 
 
             <div class="col-md-4 mb-3">
-                <form action="join_game.php" method="GET">
+                <form action="../controller/join_game.php" method="GET">
                     <div class="input-group">
                         <input type="number" class="form-control" name="game_id" placeholder="ID de la partie" required>
                         <button type="submit" class="btn btn-primary">

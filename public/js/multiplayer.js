@@ -1,6 +1,14 @@
+window.addEventListener("beforeunload", () => {
+  navigator.sendBeacon(
+    "../controller/forfeit_controller.php",
+    new URLSearchParams({ game_id: gameId })
+  );
+});
+
 console.log("isKingInCheck existe ?", typeof isKingInCheck);
 
 let lastCheckStatus = null;
+let lastNoMoves = false;
 
 const urlParams = new URLSearchParams(window.location.search);
 const gameId = urlParams.get("game_id");
@@ -80,34 +88,46 @@ function renderBoard(boardData) {
 
 function getGameState() {
   fetch(`../controller/get_game_state.php?game_id=${gameId}`)
-    .then((response) => response.json())
+    .then((res) => res.json())
     .then((data) => {
-      console.log("[BOARD reçu]", data.board);
       if (data.error) {
         console.error("Erreur :", data.error);
         return;
       }
 
+      // 1) Plateau
       renderBoard(data.board);
+
+      // 2) Tour
       updateTurnIndicator(data.turn);
       currentTurn = data.turn;
 
+      // 3) Rotation pour le joueur noir
       if (!playerColor && data.player_color) {
         playerColor = data.player_color;
         rotateBoardIfNeeded();
       }
 
-      // On attend  pour s'assurer que le DOM est bien prêt
+      // 4) **— MISE À JOUR DES CARTES —**
+      if (data.white_nick) {
+        const wCard = document.querySelector(".white-card");
+        wCard.querySelector(".player-name").textContent = data.white_nick;
+        wCard.querySelector("img").src = `../public/img/${data.white_avatar}`;
+      }
+      if (data.black_nick) {
+        const bCard = document.querySelector(".black-card");
+        bCard.querySelector(".player-name").textContent = data.black_nick;
+        bCard.querySelector("img").src = `../public/img/${data.black_avatar}`;
+      }
 
+      // 5) Vérif échec/mat
       setTimeout(() => {
         requestAnimationFrame(() => {
-          checkGameStatus(currentTurn); // ← on vérifie le roi du joueur qui va jouer
+          checkGameStatus(currentTurn);
         });
       }, 50);
     })
-    .catch((err) => {
-      console.error("Erreur AJAX :", err);
-    });
+    .catch((err) => console.error("Erreur AJAX :", err));
 }
 
 function updateTurnIndicator(turn) {
@@ -150,33 +170,26 @@ document.querySelectorAll(".square").forEach((square) => {
         }
 
         //  Envoie au serveur
+
         fetch("../controller/move_controller.php", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
           body: `game_id=${gameId}&from=${from}&to=${to}`,
         })
-          .then((res) => res.text())
-          .then((data) => {
-            console.log("Réponse brute du serveur : ", data);
-            try {
-              const jsonResponse = JSON.parse(data);
-              if (jsonResponse.success) {
-                selectedSquare.classList.remove("selected");
-                selectedSquare = null;
-                getGameStateWithCallback((justMoved) => {
-                  checkGameStatus(justMoved);
-                });
-              } else {
-                alert(jsonResponse.error);
-                selectedSquare.classList.remove("selected");
-                selectedSquare = null;
-                getGameState();
-              }
-            } catch (error) {
-              console.error("Erreur de parsing JSON :", error);
-              alert("Une erreur est survenue.");
+          .then((res) => res.json())
+          .then((jsonResponse) => {
+            if (jsonResponse.success) {
+              lastCheckStatus = null;
+              lastNoMoves = false;
+
+              selectedSquare?.classList.remove("selected");
+              selectedSquare = null;
+
+              getGameStateWithCallback(checkGameStatus);
+            } else {
+              alert(jsonResponse.error);
+              selectedSquare?.classList.remove("selected");
+              selectedSquare = null;
               getGameState();
             }
           })
@@ -186,20 +199,18 @@ document.querySelectorAll(".square").forEach((square) => {
 
         return;
       } else {
-        // Mouvement invalide
         selectedSquare.classList.remove("selected");
         selectedSquare = null;
         return;
       }
     }
 
-    //  Sélection d’une pièce jouable
     if (piece) {
       const isWhite = piece.classList.contains("white-piece");
       const pieceColor = isWhite ? "white" : "black";
 
       if (pieceColor !== playerColor || playerColor !== currentTurn) {
-        return; // pas ta pièce ou pas ton tour
+        return;
       }
 
       if (selectedSquare) selectedSquare.classList.remove("selected");
@@ -210,18 +221,20 @@ document.querySelectorAll(".square").forEach((square) => {
   });
 });
 
-function showMessage(message) {
+function showMessage(message, persistent = false) {
   const box = document.getElementById("game-message");
   if (!box) return;
-
   box.textContent = message;
   box.style.display = "block";
   box.classList.add("fade-up");
 
-  setTimeout(() => {
-    box.style.display = "none";
-    box.classList.remove("fade-up");
-  }, 3000);
+  if (!persistent) {
+    // Message temporaire
+    setTimeout(() => {
+      box.style.display = "none";
+      box.classList.remove("fade-up");
+    }, 3000);
+  }
 }
 
 // Rafraîchit automatiquement toutes les 2 secondes
@@ -236,58 +249,64 @@ function getGameStateWithCallback(callback) {
         return;
       }
 
+      // 1) on réaffiche le plateau
       renderBoard(data.board);
-      setTimeout(() => {
-        console.log(
-          "[AFTER renderBoard] Position du roi blanc :",
-          [...document.querySelectorAll(".square")].find(
-            (s) => s.querySelector("span")?.textContent === "♔"
-          )?.id
-        );
-      }, 100);
 
-      const previousTurn = currentTurn;
+      // 2) on met à jour l'indicateur de tour
       updateTurnIndicator(data.turn);
+
+      // 3) on bascule le tour courant
       currentTurn = data.turn;
 
+      // 4) si c'est la première fois, on récupère la couleur
       if (!playerColor && data.player_color) {
         playerColor = data.player_color;
         rotateBoardIfNeeded();
       }
 
+      // 5) on appelle le callback avec **currentTurn** pour vérifier
+      //    l'état du roi du joueur qui doit jouer **maintenant**
       if (typeof callback === "function") {
-        const justMoved = previousTurn; // ← le tour d'avant
-        callback(justMoved);
+        callback(currentTurn);
       }
     })
     .catch((err) => {
       console.error("Erreur AJAX :", err);
     });
 }
+
 function checkGameStatus(color) {
-  console.log(`[STATUT] Vérification pour le roi ${color}`);
+  const nowInCheck = isKingInCheck(color);
 
-  requestAnimationFrame(() => {
-    setTimeout(() => {
-      const gameStatusMessage = document.getElementById("game-status");
+  // 1) Gestion de l'échec uniquement sur transition
+  if (lastCheckStatus !== nowInCheck) {
+    if (nowInCheck) {
+      showMessage("Échec", true);
+    } else {
+      const box = document.getElementById("game-message");
+      if (box) box.style.display = "none";
+    }
+    lastCheckStatus = nowInCheck;
+  }
 
-      if (isKingInCheck(color)) {
-        showMessage("Échec");
-      } else if (gameStatusMessage) {
-        gameStatusMessage.style.display = "none";
+  // 2) Gestion du mat/pat uniquement sur transition
+  const noMoves = !canKingEscape(color) && !canBlockCheck(color);
+  if (lastNoMoves !== noMoves) {
+    if (noMoves) {
+      if (nowInCheck) {
+        const winner = color === "white" ? "Noir" : "Blanc";
+        showMessage(`Échec et mat ! ${winner} gagne !`, true);
+      } else {
+        showMessage("Pat ! Partie nulle.", true);
       }
-
-      if (!canKingEscape(color) && !canBlockCheck(color)) {
-        if (isKingInCheck(color)) {
-          const winner = color === "white" ? "Noir" : "Blanc";
-          showMessage(`Échec et mat ! ${winner} gagne !`);
-        } else {
-          showMessage("Pat ! Partie nulle.");
-        }
-
-        const buttons = document.getElementById("end-buttons");
-        if (buttons) buttons.style.display = "block";
-      }
-    }, 50); // ← petit délai pour laisser le DOM vraiment finir
-  });
+      const buttons = document.getElementById("end-buttons");
+      if (buttons) buttons.style.display = "block";
+    } else {
+      const box = document.getElementById("game-message");
+      if (box) box.style.display = "none";
+      const buttons = document.getElementById("end-buttons");
+      if (buttons) buttons.style.display = "none";
+    }
+    lastNoMoves = noMoves;
+  }
 }

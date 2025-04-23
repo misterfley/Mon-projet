@@ -7,14 +7,15 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Tirage  pour savoir si  blanc ou noir
+// Tirage pour savoir si le joueur est blanc ou noir
 $white = null;
 $black = null;
-
 if (rand(0, 1) === 0) {
     $white = $_SESSION['user_id'];
+    $color = 'white';
 } else {
     $black = $_SESSION['user_id'];
+    $color = 'black';
 }
 
 // Plateau initial en JSON
@@ -53,13 +54,24 @@ $initialBoard = json_encode([
     "h8" => "br"
 ]);
 
-// Création en base
-$stmt = $pdo->prepare("INSERT INTO game (player_white, player_black, current_board, turn) VALUES (?, ?, ?, 'white')");
-$stmt->execute([$white, $black, $initialBoard]);
+// Création en base avec status = 'open'
+$stmt = $pdo->prepare("
+  INSERT INTO game (player_white, player_black, current_board, turn, status)
+  VALUES (?, ?, ?, 'white', 'open')
+");
+$stmt->execute([
+    $white,
+    $black,
+    $initialBoard
+]);
 
-// Récup ID de la partie
+// Récupérer l’ID fraîchement créé
 $gameId = $pdo->lastInsertId();
 
+// On stocke en session pour pouvoir gérer l’abandon plus tard
+$_SESSION['game_id']      = $gameId;
+$_SESSION['player_color'] = $color;
 
+// On redirige vers l’interface de jeu
 header("Location: ../view/board.php?mode=multi&game_id=$gameId");
 exit();

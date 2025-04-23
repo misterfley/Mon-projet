@@ -1,55 +1,83 @@
 <?php
+header('Content-Type: application/json; charset=UTF-8');
 session_start();
-require_once("pdo.php");
+require_once __DIR__ . '/pdo.php';
 
-
-if (!isset($_GET['game_id'])) {
-    header('HTTP/1.1 400 Bad Request');
-    echo json_encode(["error" => "game_id manquant"]);
+// 1) Validation de game_id
+if (empty($_GET['game_id']) || !is_numeric($_GET['game_id'])) {
+    echo json_encode(['error' => 'game_id invalide']);
     exit;
 }
+$gameId = (int)$_GET['game_id'];
 
-$gameId = $_GET['game_id'];
-
-
-$stmt = $pdo->prepare("SELECT * FROM game WHERE id_game = ?");
+// 2) Chargement des données de la partie
+$stmt = $pdo->prepare("
+    SELECT current_board, turn, player_white, player_black
+      FROM game
+     WHERE id_game = ?
+");
 $stmt->execute([$gameId]);
 $game = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// Si la partie n'existe pas
 if (!$game) {
-    header('HTTP/1.1 404 Not Found');
-    echo json_encode(["error" => "Partie introuvable"]);
+    echo json_encode(['error' => 'Partie introuvable']);
     exit;
 }
 
-// On récupère l'utilisateur connecté via la session
-$userId = $_SESSION['user_id'] ?? null;
+// 3) Préparation des variables
+$board        = json_decode($game['current_board'], true);
+$turn         = $game['turn'];
+$player_color = $_SESSION['player_color'] ?? null;
+
+// 4) Préparation de la requête joueur
+$stmtPlayer = $pdo->prepare("
+    SELECT nickname_player, image_player
+      FROM player
+     WHERE id_player = ?
+");
 
 
-if (!$userId) {
-    header('HTTP/1.1 403 Forbidden');
-    echo json_encode(["error" => "Utilisateur non connecté"]);
-    exit;
+
+// 5) Récupération blanc
+if ($game['player_white']) {
+    $stmtPlayer->execute([$game['player_white']]);
+    $pw = $stmtPlayer->fetch(PDO::FETCH_ASSOC);
+    if ($pw) {
+        $white_nick = $pw['nickname_player'];
+        // si y a bien un fichier, on le préfixe ; sinon on utilise le default
+        $white_avatar = $pw['image_player']
+            ? 'uploads/' . $pw['image_player']
+            : 'static/default-avatar.webp';
+    }
+} else {
+    // pas encore de joueur blanc
+    $white_nick   = null;
+    $white_avatar = 'static/default-avatar.webp';
 }
 
-$playerColor = null;
-if ($userId == $game['player_white']) {
-    $playerColor = "white";
-} elseif ($userId == $game['player_black']) {
-    $playerColor = "black";
+// 6) Récupération noir
+if ($game['player_black']) {
+    $stmtPlayer->execute([$game['player_black']]);
+    $pb = $stmtPlayer->fetch(PDO::FETCH_ASSOC);
+    if ($pb) {
+        $black_nick = $pb['nickname_player'];
+        $black_avatar = $pb['image_player']
+            ? 'uploads/' . $pb['image_player']
+            : 'static/default-avatar.webp';
+    }
+} else {
+    $black_nick   = null;
+    $black_avatar = 'static/default-avatar.webp';
 }
 
 
-if (!$playerColor) {
-    header('HTTP/1.1 403 Forbidden');
-    echo json_encode(["error" => "Vous n'êtes pas dans cette partie"]);
-    exit;
-}
-
-// Réponse JSON envoyée au frontend (multiplayer.js)
+// 7) Envoi du JSON
 echo json_encode([
-    "board" => json_decode($game['current_board'], true), // état de l'échiquier
-    "turn" => $game['turn'],                              // couleur du joueur dont c'est le tour
-    "player_color" => $playerColor                        // couleur du joueur connecté
+    'board'         => $board,
+    'turn'          => $turn,
+    'player_color'  => $player_color,
+    'white_nick'    => $white_nick,
+    'white_avatar'  => $white_avatar,
+    'black_nick'    => $black_nick,
+    'black_avatar'  => $black_avatar,
 ]);

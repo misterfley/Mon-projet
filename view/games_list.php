@@ -9,17 +9,18 @@ if (!isset($_SESSION['user_id'])) {
 
 // Récupérer les parties ouvertes
 $stmt = $pdo->query("
-    SELECT g.id_game, g.player_white, g.player_black,
-           pw.nickname_player AS white_nick, pb.nickname_player AS black_nick
+    SELECT
+      g.id_game,
+      pw.nickname_player AS white_nick,
+      pb.nickname_player AS black_nick
     FROM game g
     LEFT JOIN player pw ON g.player_white = pw.id_player
     LEFT JOIN player pb ON g.player_black = pb.id_player
-    WHERE g.player_white IS NULL OR g.player_black IS NULL
+    WHERE g.status = 'open'
     ORDER BY g.id_game DESC
 ");
 $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
-
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -35,7 +36,7 @@ $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="container mt-5">
         <h1 class="text-center mb-4">Parties disponibles</h1>
 
-        <?php if (count($games) === 0): ?>
+        <?php if (empty($games)): ?>
             <p class="text-center text-muted">Aucune partie disponible pour le moment.</p>
         <?php else: ?>
             <table class="table table-striped text-center">
@@ -51,10 +52,12 @@ $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php foreach ($games as $game): ?>
                         <tr>
                             <td>#<?php echo $game['id_game']; ?></td>
-                            <td><?php echo $game['white_nick'] ?? "<em>Libre</em>"; ?></td>
-                            <td><?php echo $game['black_nick'] ?? "<em>Libre</em>"; ?></td>
+                            <td><?php echo $game['white_nick'] ?? '<em>Libre</em>'; ?></td>
+                            <td><?php echo $game['black_nick'] ?? '<em>Libre</em>'; ?></td>
                             <td>
-                                <a href="join_game.php?game_id=<?php echo $game['id_game']; ?>" class="btn btn-primary btn-sm">
+                                <a
+                                    href="../controller/join_game.php?game_id=<?php echo $game['id_game']; ?>"
+                                    class="btn btn-primary btn-sm">
                                     Rejoindre
                                 </a>
                             </td>
