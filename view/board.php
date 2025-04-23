@@ -32,16 +32,15 @@ if ($mode === 'multi') {
   $stmt->execute([$gameId]);
   $game = $stmt->fetch(PDO::FETCH_ASSOC) ?: die("Partie introuvable.");
 
-  $whiteNick   = $game['white_nick']  ?? 'Libre';
-  $blackNick   = $game['black_nick']  ?? 'Libre';
+  $whiteNick   = $game['white_nick'] ?? 'Libre';
+  $blackNick   = $game['black_nick'] ?? 'Libre';
   if ($game['image_white']) $whiteAvatar = 'uploads/' . $game['image_white'];
   if ($game['image_black']) $blackAvatar = 'uploads/' . $game['image_black'];
   $turn = $game['turn'];
 
   $_SESSION['game_id']      = $gameId;
   $_SESSION['player_color'] = ($_SESSION['user_id'] == $game['player_white'])
-    ? 'white'
-    : 'black';
+    ? 'white' : 'black';
 }
 ?>
 <!DOCTYPE html>
@@ -61,6 +60,18 @@ if ($mode === 'multi') {
   <?php include 'base.php'; ?>
 
   <main class="board-zone">
+    <!-- Sélecteur de thème -->
+    <div class="theme-switcher mb-3">
+      <label for="theme">Thème :</label>
+      <select id="theme" class="form-select form-select-sm d-inline-block w-auto ms-2">
+        <option value="">Par défaut</option>
+        <option value="theme-sand">Plage</option>
+        <option value="theme-forest">Forêt</option>
+        <option value="theme-ocean">Ocean</option>
+        <option value="theme-cerisier">Cerisier</option>
+      </select>
+    </div>
+
     <div class="board-wrapper">
       <?php if ($mode === 'multi'): ?>
         <div class="player-card white-card">
@@ -73,7 +84,6 @@ if ($mode === 'multi') {
       <div class="player-indicator">
         <?php echo ($turn === 'white') ? 'Blanc joue' : 'Noir joue'; ?>
       </div>
-
       <div class="board" id="board">
         <?php
         $files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
@@ -136,6 +146,7 @@ if ($mode === 'multi') {
         </div>
       <?php endif; ?>
     </div>
+
     <div id="game-status" style="display:none;color:red;"></div>
     <div id="game-message" style="display:none;"></div>
   </main>
@@ -154,6 +165,32 @@ if ($mode === 'multi') {
   <?php endif; ?>
 
   <script>
+    const themeSelect = document.getElementById('theme');
+
+    // 1) Au chargement : applique le thème sauvegardé si présent
+    const saved = localStorage.getItem('echecmania-theme');
+    if (saved) {
+      document.body.classList.add(saved);
+      themeSelect.value = saved;
+    }
+
+    // 2) À chaque changement de select : bascule la classe, sauvegarde
+    themeSelect.addEventListener('change', e => {
+      // retire toutes les classes de thème
+      [...themeSelect.options]
+      .map(o => o.value)
+        .filter(v => v)
+        .forEach(v => document.body.classList.remove(v));
+
+      const theme = e.target.value;
+      if (theme) {
+        document.body.classList.add(theme);
+        localStorage.setItem('echecmania-theme', theme);
+      } else {
+        localStorage.removeItem('echecmania-theme');
+      }
+    });
+    // Forfait on close
     window.addEventListener("beforeunload", () => {
       navigator.sendBeacon?.("../controller/leave_game.php");
     });

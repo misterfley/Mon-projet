@@ -310,3 +310,20 @@ function checkGameStatus(color) {
     lastNoMoves = noMoves;
   }
 }
+// Récupération et application du thème
+document.addEventListener("DOMContentLoaded", () => {
+  const themeSelect = document.getElementById("theme");
+  if (!themeSelect) return;
+
+  // Au changement
+  themeSelect.addEventListener("change", (e) => {
+    // Liste des thèmes possibles
+    const THEMES = ["theme-sand", "theme-forest"];
+    document.body.classList.remove(...THEMES);
+
+    const theme = e.target.value;
+    if (THEMES.includes(theme)) {
+      document.body.classList.add(theme);
+    }
+  });
+});
