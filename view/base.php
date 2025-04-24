@@ -3,12 +3,12 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 ?>
-<nav class="navbar navbar-expand-lg bg-dark navbar-dark">
+<nav class="navbar navbar-expand-lg bg-dark navbar-dark p-0">
     <div class="container">
 
-        <a class="navbar-brand text-light d-flex align-items-center" href="<?php echo isset($_SESSION['nickname_player']) ? 'game.php' : '../index.php'; ?>">
-            <img src="../public/img/static/logo3.png" alt="Logo" style="height: 30px; width: auto;" class="me-2">
-            ECHECMANIA
+        <a class="navbar-brand text-light d-flex align-items-center logo" href="<?php echo isset($_SESSION['nickname_player']) ? 'game.php' : '../index.php'; ?>">
+            <img src="../public/img/static/roquenroll7.png" alt="Logo" style="height: 80px; width: auto;" class="me-2">
+            ROQUE'N'ROLL
         </a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">

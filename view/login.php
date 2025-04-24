@@ -1,16 +1,12 @@
-<?php
-session_start();
-include("message.php");
-?>
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="fr">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Connexion</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Connexion – Roque’n’Roll</title>
     <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../node_modules/bootstrap-icons/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../public/css/style.css">
 </head>
 
@@ -18,19 +14,35 @@ include("message.php");
     <?php include("base.php"); ?>
     <?php include("message.php"); ?>
 
-    <h1 class="text-center mt-4">Connexion</h1>
+    <main class="container py-5">
+        <h1 class="text-center mb-4">Se connecter</h1>
+        <form action="../controller/login.php" method="POST"
+            class="mx-auto" style="max-width: 400px;">
+            <div class="mb-3">
+                <label for="email" class="form-label">Adresse e-mail</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    class="form-control"
+                    placeholder="you@example.com"
+                    required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Mot de passe</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    class="form-control"
+                    placeholder="••••••••"
+                    required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Connexion</button>
+        </form>
+    </main>
 
-    <form class="w-25 mx-auto mt-4" action="../controller/login_controller.php" method="POST">
-        <label class="form-label" for="email_player">Email de connexion</label>
-        <input type="email" class="form-control" name="email_player" required>
-
-        <label class="form-label mt-3" for="password_player">Mot de passe</label>
-        <input class="form-control" type="password" name="password_player" required>
-
-        <div class="text-center my-4">
-            <input class="btn btn-primary" type="submit" value="Connexion">
-        </div>
-    </form>
+    <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

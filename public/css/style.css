@@ -3,13 +3,80 @@ body {
   font-family: Arial, sans-serif;
   background-color: #f0f0f0;
 }
-#thanos {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: calc(100vh - 80px);
-  padding-top: 40px;
+@font-face {
+  font-family: "bangers";
+  src: url(../fonts/Bangers.ttf);
+}
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateX(100px) translateY(-50%);
+  }
+  to {
+    opacity: 0.8;
+    transform: scale(1) translateX(0) translateY(-50%);
+  }
+}
+.logo {
+  font-family: "Bangers", cursive;
+
+  font-size: 6vw;
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateX(-100px) translateY(-50%);
+  }
+  to {
+    opacity: 0.8;
+    transform: scale(1) translateX(0) translateY(-50%);
+  }
+}
+input.form-control,
+button.btn {
+  font-family: Arial, sans-serif;
+  font-size: 1rem;
+}
+input.form-control {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.global {
+  position: relative;
+  padding: 2rem;
+  border-radius: 0.5rem;
+}
+
+.global::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -3rem;
+  transform: translateY(-50%);
+  width: 480px;
+  height: 480px;
+  background: url("../img/static/chanteuse.png") no-repeat center/contain;
+  opacity: 0.8;
+  z-index: -1;
+  pointer-events: none;
+  animation: fadeInLeft 0.7s ease-out forwards;
+}
+
+.global::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -3rem;
+  transform: translateY(-50%);
+  width: 480px;
+  height: 480px;
+  background: url("../img/static/guitariste.png") no-repeat center/contain;
+  opacity: 0.8;
+  z-index: -1;
+  pointer-events: none;
+  animation: fadeInRight 0.7s ease-out forwards;
 }
 
 .navbar-brand img {
@@ -38,15 +105,6 @@ body {
   color: white;
 }
 
-#thanos img {
-  width: 50%;
-  height: auto;
-}
-
-#thanos h1 {
-  font-size: 1.5rem;
-  margin-top: 20px;
-}
 #flash-message {
   transition: opacity 0.5s ease;
 }
@@ -60,5 +118,60 @@ body {
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+.card {
+  border: 1px solid #dba256;
+  box-shadow: 0 1px 8px 0 #111;
+}
+
+/* Tablettes et petits laptops */
+@media (max-width: 1024px) {
+  .global::before,
+  .global::after {
+    width: 320px;
+    height: 320px;
+  }
+  .global::before {
+    left: -2rem;
+  }
+  .global::after {
+    right: -2rem;
+  }
+}
+
+/* Mobiles classiques */
+@media (max-width: 480px) {
+  .global::before,
+  .global::after {
+    display: none;
+  }
+  .logo {
+    font-size: 1.5rem;
+  }
+}
+@media (max-width: 576px) {
+  form.mx-auto {
+    padding: 0 1rem;
+  }
+}
+/* Mobiles larges (tablettes verticales, phablets) */
+@media (max-width: 768px) {
+  .global::before,
+  .global::after {
+    width: 240px;
+    height: 240px;
+    opacity: 0.6;
+  }
+  .global::before {
+    left: -1.5rem;
+  }
+  .global::after {
+    right: -1.5rem;
+  }
+}
+@media (min-width: 1200px) {
+  .logo {
+    font-size: 3rem;
   }
 }

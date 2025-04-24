@@ -73,9 +73,6 @@ body.board-page {
   box-sizing: border-box;
 }
 
-/* =========================
-   ÉCHIQUIER
-   ========================= */
 .board {
   display: grid;
   grid-template-columns: repeat(8, 1fr);

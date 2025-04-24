@@ -17,7 +17,7 @@
     <?php include("base.php"); ?>
     <?php include("message.php"); ?>
 
-    <div class="container text-center mt-5">
+    <div class="container text-center mt-5 formal">
 
         <?php if (!isset($_SESSION['nickname_player'])): ?>
             <h2 class="text-light mb-4">Identifie-toi pour entrer dans la partie.</h2>
@@ -25,12 +25,12 @@
             <h2 class="text-success mb-4">Bienvenue, <?php echo htmlspecialchars($_SESSION['nickname_player']); ?> !</h2>
         <?php endif; ?>
 
-        <img src="../public/img/static/logo2.png" class="img-fluid mb-4 logo-home-animated" alt="Logo Echecs" style="max-width: 400px;">
+        <img src="../public/img/static/roquenroll8.png" class="img-fluid mb-4 logo-home-animated" alt="Logo Echecs" style="max-width: 400px;">
 
 
 
-        <h4 class="text-muted mt-3">"Connecté. Stratégique. Addictif,</h4>
-        <h4 class="text-muted mt-3">Rejoins la ChessMania, là où les pions deviennent rois."</h4>
+        <h4 class="text-muted mt-3">"Connecté, Fun Addictif,</h4>
+        <h4 class="text-muted mt-3">Rejoins Roque'N'Roll, là où les pions deviennent rois."</h4>
     </div>
 
 

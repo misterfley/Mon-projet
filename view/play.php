@@ -21,7 +21,7 @@ if (!isset($_SESSION['user_id'])) {
 <body>
     <?php include('base.php'); ?>
 
-    <div class="container mt-5">
+    <div class="container mt-5 ">
         <div class="row justify-content-center">
 
             <div class="col-md-4 mb-3">
