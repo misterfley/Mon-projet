@@ -28,52 +28,63 @@ $history = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Historique des parties</title>
     <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../public/css/style.css">
+    <script defer src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
 </head>
 
 <body>
-    <?php include("base.php"); ?>
-    <div class="container mt-5">
-        <h1 class="mb-4 text-center">Historique des parties</h1>
-        <?php if (empty($history)): ?>
-            <p class="text-center text-muted">Aucune partie terminée pour l’instant.</p>
-        <?php else: ?>
-            <table class="table table-striped text-center">
-                <thead class="table-dark">
-                    <tr>
-                        <th>ID Partie</th>
-                        <th>Blanc</th>
-                        <th>Noir</th>
-                        <th>Vainqueur</th>
-                        <th>Terminé le</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($history as $row): ?>
-                        <tr>
-                            <td>#<?= $row['id_game'] ?></td>
-                            <td><?= htmlspecialchars($row['white_nick']   ?? '—') ?></td>
-                            <td><?= htmlspecialchars($row['black_nick']   ?? '—') ?></td>
-                            <td>
-                                <?php
-                                if ($row['winner'] === 'draw') {
-                                    echo 'Match nul';
-                                } elseif ($row['winner'] === 'white') {
-                                    echo htmlspecialchars($row['white_nick'] ?? '—');
-                                } else {
-                                    echo htmlspecialchars($row['black_nick'] ?? '—');
-                                }
-                                ?>
-                            </td>
-                            <td><?= date('d/m/Y H:i', strtotime($row['ended_at'])) ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+    <?php include("nav.php"); ?>
 
-        <?php endif; ?>
-    </div>
+    <main>
+        <div class="container mt-5">
+            <h1 class="mb-4 text-center">Historique des parties</h1>
+
+            <?php if (empty($history)): ?>
+                <p class="text-center text-muted">Aucune partie terminée pour l’instant.</p>
+            <?php else: ?>
+                <div class="table-responsive">
+                    <table class="table table-striped text-center ">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID Partie</th>
+                                <th>Blanc</th>
+                                <th>Noir</th>
+                                <th>Vainqueur</th>
+                                <th>Terminé le</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($history as $row): ?>
+                                <tr>
+                                    <td>#<?= $row['id_game'] ?></td>
+                                    <td><?= htmlspecialchars($row['white_nick'] ?? '—') ?></td>
+                                    <td><?= htmlspecialchars($row['black_nick'] ?? '—') ?></td>
+                                    <td>
+                                        <?php
+                                        if ($row['winner'] === 'draw') {
+                                            echo 'Match nul';
+                                        } elseif ($row['winner'] === 'white') {
+                                            echo htmlspecialchars($row['white_nick'] ?? '—');
+                                        } else {
+                                            echo htmlspecialchars($row['black_nick'] ?? '—');
+                                        }
+                                        ?>
+                                    </td>
+                                    <td><?= date('d/m/Y H:i', strtotime($row['ended_at'])) ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
+        </div>
+    </main>
+
+    <?php include("footer.php"); ?>
 </body>
 
 </html>

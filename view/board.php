@@ -18,7 +18,10 @@ $whiteAvatar = $blackAvatar = 'static/default-avatar.webp';
 $turn        = 'white';
 
 if ($mode === 'multi') {
-  if (!$gameId) die("ID de partie manquant.");
+  if (!$gameId) {
+    die("ID de partie manquant.");
+  }
+  // On récupère tout, y compris player_white/player_black
   $stmt = $pdo->prepare("
     SELECT g.current_board, g.turn,
            g.player_white, g.player_black,
@@ -32,6 +35,17 @@ if ($mode === 'multi') {
   $stmt->execute([$gameId]);
   $game = $stmt->fetch(PDO::FETCH_ASSOC) ?: die("Partie introuvable.");
 
+  // ————— NOUVEAU : bloque le 3ᵉ joueur —
+  $isWhite  = ($_SESSION['user_id'] == $game['player_white']);
+  $isBlack  = ($_SESSION['user_id'] == $game['player_black']);
+  $hasWhite = !is_null($game['player_white']);
+  $hasBlack = !is_null($game['player_black']);
+  if ($hasWhite && $hasBlack && !$isWhite && !$isBlack) {
+    header("Location: play.php?message=Cette partie est complète.&status=warning");
+    exit();
+  }
+
+
   $whiteNick   = $game['white_nick'] ?? 'Libre';
   $blackNick   = $game['black_nick'] ?? 'Libre';
   if ($game['image_white']) $whiteAvatar = 'uploads/' . $game['image_white'];
@@ -39,8 +53,7 @@ if ($mode === 'multi') {
   $turn = $game['turn'];
 
   $_SESSION['game_id']      = $gameId;
-  $_SESSION['player_color'] = ($_SESSION['user_id'] == $game['player_white'])
-    ? 'white' : 'black';
+  $_SESSION['player_color'] = $isWhite ? 'white' : 'black';
 }
 ?>
 <!DOCTYPE html>
@@ -57,10 +70,10 @@ if ($mode === 'multi') {
 </head>
 
 <body class="board-page">
-  <?php include 'base.php'; ?>
+  <?php include 'nav.php'; ?>
 
   <main class="board-zone">
-    <!-- Sélecteur de thème -->
+
     <div class="theme-switcher mb-3">
       <label for="theme">Thème :</label>
       <select id="theme" class="form-select form-select-sm d-inline-block w-auto ms-2">
@@ -150,7 +163,7 @@ if ($mode === 'multi') {
     <div id="game-status" style="display:none;color:red;"></div>
     <div id="game-message" style="display:none;"></div>
   </main>
-
+  <?php include("footer.php"); ?>
   <script>
     window.gameConfig = {
       gameId: <?php echo json_encode($gameId) ?>,

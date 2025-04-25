@@ -6,7 +6,7 @@ if (session_status() === PHP_SESSION_NONE) {
 <nav class="navbar navbar-expand-lg bg-dark navbar-dark p-0">
     <div class="container">
 
-        <a class="navbar-brand text-light d-flex align-items-center logo" href="<?php echo isset($_SESSION['nickname_player']) ? 'game.php' : '../index.php'; ?>">
+        <a class="navbar-brand text-light d-flex align-items-center logo" href="<?php echo isset($_SESSION['nickname_player']) ? 'profile.php' : '../index.php'; ?>">
             <img src="../public/img/static/roquenroll7.png" alt="Logo" style="height: 80px; width: auto;" class="me-2">
             ROQUE'N'ROLL
         </a>

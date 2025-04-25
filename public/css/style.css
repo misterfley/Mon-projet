@@ -2,7 +2,11 @@ body {
   margin: 0;
   font-family: Arial, sans-serif;
   background-color: #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
+
 @font-face {
   font-family: "bangers";
   src: url(../fonts/Bangers.ttf);
@@ -125,6 +129,13 @@ input.form-control {
   box-shadow: 0 1px 8px 0 #111;
 }
 
+main {
+  flex: auto;
+}
+footer {
+  flex-shrink: 0;
+}
+
 /* Tablettes et petits laptops */
 @media (max-width: 1024px) {
   .global::before,
@@ -151,11 +162,57 @@ input.form-control {
   }
 }
 @media (max-width: 576px) {
-  form.mx-auto {
-    padding: 0 1rem;
+}
+
+@media (max-width: 576px) {
+  .container {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  h1.text-center {
+    font-size: 1.75rem;
   }
 }
-/* Mobiles larges (tablettes verticales, phablets) */
+
+input.form-control,
+button.btn {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+main {
+  flex: 1 0 auto;
+  padding-bottom: 2rem;
+}
+
+.container {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+h1.text-center {
+  font-size: 1.75rem;
+}
+
+input.form-control,
+button.btn {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+main {
+  flex: 1 0 auto;
+  padding-bottom: 2rem;
+}
+
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-responsive table {
+  min-width: 600px;
+}
+
 @media (max-width: 768px) {
   .global::before,
   .global::after {
