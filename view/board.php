@@ -62,7 +62,7 @@ if ($mode === 'multi') {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>ECHECMANIA</title>
+  <title>Roque’N’Roll</title>
   <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="../public/css/style.css">
   <link rel="stylesheet" href="../public/css/board.css">
@@ -180,7 +180,7 @@ if ($mode === 'multi') {
   <script>
     const themeSelect = document.getElementById('theme');
 
-    // 1) Au chargement : applique le thème sauvegardé si présent
+    // 1) Au chargement : thème sauvegardé si présent
     const saved = localStorage.getItem('echecmania-theme');
     if (saved) {
       document.body.classList.add(saved);
@@ -203,7 +203,7 @@ if ($mode === 'multi') {
         localStorage.removeItem('echecmania-theme');
       }
     });
-    // Forfait on close
+    // Forfait si la personne quitte la page.
     window.addEventListener("beforeunload", () => {
       navigator.sendBeacon?.("../controller/leave_game.php");
     });

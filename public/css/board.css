@@ -84,7 +84,9 @@ body.board-page {
   margin-bottom: 1rem;
   z-index: 20;
 }
-
+.theme-switcher select:hover {
+  filter: brightness(1.1);
+}
 .board {
   display: grid;
   grid-template: repeat(8, 1fr) / repeat(8, 1fr);
@@ -153,8 +155,8 @@ body.board-page {
   transform: translate(-50%, -120%);
   z-index: 10;
   margin: 0;
-  padding: 8px 12px;
-  background: rgba(0, 0, 0, 0.3);
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, 0.5);
   color: #fff;
   font-size: 1.2rem;
   font-weight: bold;
@@ -188,19 +190,26 @@ body.board-page {
   position: absolute;
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 6px 10px;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 2px solid transparent;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  z-index: 5;
+
   width: 160px;
+  justify-content: center;
+  text-align: center;
 }
 
-.avatar-sm {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  margin-right: 8px;
-  object-fit: cover;
+.player-card .player-name {
+  flex: 1;
+  white-space: nowrap; /* éviter le retour à la ligne */
+  overflow: hidden;
+  text-overflow: ellipsis; /* tronquer si trop long */
 }
 
 .player-name {
@@ -213,14 +222,31 @@ body.board-page {
   top: -7%;
   left: 1%;
   transform: translate(-50%, -20%);
+  border-color: var(--square-dark);
 }
 .black-card {
   bottom: 0;
   right: 0;
   transform: translate(50%, 130%);
+  border-color: var(--square-dark);
+}
+.avatar-sm {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  object-fit: cover;
 }
 
+.player-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #222;
+}
 @media (max-width: 576px) {
+  .board-zone {
+    gap: 2rem;
+  }
   .board {
     width: 90vw;
     height: 90vw;
@@ -260,5 +286,16 @@ body.board-page {
   }
   #game-message {
     order: 3;
+  }
+  .player-card {
+    padding: 6px 10px;
+    gap: 6px;
+  }
+  .avatar-sm {
+    width: 32px;
+    height: 32px;
+  }
+  .player-name {
+    font-size: 0.9rem;
   }
 }

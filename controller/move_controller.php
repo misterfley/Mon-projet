@@ -57,7 +57,7 @@ if (
     exit();
 }
 
-// Mise à jour du plateau
+// Mise à jour  plateau
 unset($board[$from]);
 $board[$to] = $movingPiece;
 
@@ -66,13 +66,12 @@ if (strpos($movingPiece, 'k') !== false && abs(ord($from[0]) - ord($to[0])) == 2
     if ($turn === 'white') {
         $whiteKingMoved = true;
         if ($from === 'e1' && $to === 'g1') {
-            // Petit roque côté roi pour les blancs
+            // Petit roque  
             $whiteRookRightMoved = true;
             unset($board['h1']);
             $board['f1'] = 'wr';
         } elseif ($from === 'e1' && $to === 'c1') {
-            // Grand roque côté dame pour les blancs
-            $whiteRookLeftMoved = true;
+            // Grand roque 
             unset($board['a1']);
             $board['d1'] = 'wr';
         }
