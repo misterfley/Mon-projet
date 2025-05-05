@@ -95,20 +95,15 @@ function getGameState() {
         return;
       }
 
-      // 1) Plateau
       renderBoard(data.board);
 
-      // 2) Tour
       updateTurnIndicator(data.turn);
       currentTurn = data.turn;
 
-      // 3) Rotation pour le joueur noir
       if (!playerColor && data.player_color) {
         playerColor = data.player_color;
         rotateBoardIfNeeded();
       }
-
-      // 4) **— MISE À JOUR DES CARTES —**
       if (data.white_nick) {
         const wCard = document.querySelector(".white-card");
         wCard.querySelector(".player-name").textContent = data.white_nick;
@@ -120,7 +115,6 @@ function getGameState() {
         bCard.querySelector("img").src = `../public/img/${data.black_avatar}`;
       }
 
-      // 5) Vérif échec/mat
       setTimeout(() => {
         requestAnimationFrame(() => {
           checkGameStatus(currentTurn);

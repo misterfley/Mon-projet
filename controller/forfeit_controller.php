@@ -6,7 +6,7 @@ $userId = $_SESSION['user_id'] ?? null;
 $gameId = $_POST['game_id'] ?? null;
 
 if ($userId && $gameId) {
-    // Si la partie est encore ongoing, on applique le même forfeit
+
     $stmt = $pdo->prepare(
         "SELECT player_white, player_black
          FROM game

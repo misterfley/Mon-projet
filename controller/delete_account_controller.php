@@ -15,12 +15,10 @@ if (strtoupper($confirm) !== 'SUPPRIMER') {
     exit();
 }
 
-// Récupérer image avant suppression
 $stmt = $pdo->prepare("SELECT image_player FROM player WHERE id_player = ?");
 $stmt->execute([$userId]);
 $image = $stmt->fetchColumn();
 
-// Supprimer image si pas par défaut
 if ($image && $image !== 'default-avatar.png') {
     $imgPath = '../public/img/uploads/' . $image;
     if (file_exists($imgPath)) {
@@ -28,14 +26,13 @@ if ($image && $image !== 'default-avatar.png') {
     }
 }
 
-// Supprimer  compte
+
 $delete = $pdo->prepare("DELETE FROM player WHERE id_player = ?");
 $delete->execute([$userId]);
 
-// Nettoyer  session
 session_unset();
 session_destroy();
 
-// Rediriger vers  homepage
+
 header("Location: ../view/homepage.php?message=Compte supprimé avec succès.&status=success");
 exit();

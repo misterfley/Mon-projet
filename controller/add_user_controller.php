@@ -5,12 +5,28 @@ if (
     !empty($_POST['lastname_player']) &&
     !empty($_POST['nickname_player']) &&
     !empty($_POST['email_player']) &&
-    !empty($_POST['password_player'])
+    !empty($_POST['password_player']) &&
+    !empty($_POST['password_confirm_player'])
 ) {
+    if ($_POST['password_player'] !== $_POST['password_confirm_player']) {
+        header("Location: ../view/add_user_form.php?message=Les mots de passe ne correspondent pas&status=error");
+        exit();
+    }
     if (!filter_var($_POST['email_player'], FILTER_VALIDATE_EMAIL)) {
         header("Location: ../view/add_user_form.php?message=Email invalide&status=error");
         exit();
     }
+    // Vérification si l'email existe déjà
+    $sqlCheck = "SELECT COUNT(*) FROM player WHERE email_player = ?";
+    $stmtCheck = $pdo->prepare($sqlCheck);
+    $stmtCheck->execute([$_POST['email_player']]);
+    $emailExists = $stmtCheck->fetchColumn();
+
+    if ($emailExists > 0) {
+        header("Location: ../view/add_user_form.php?message=Email déjà utilisé&status=error");
+        exit();
+    }
+
     $psw = password_hash($_POST["password_player"], PASSWORD_ARGON2I);
     if (isset($_FILES['image_player']) && $_FILES['image_player']['error'] === UPLOAD_ERR_OK) {
         $fileName = $_FILES["image_player"]["name"];
