@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 // On récupère toutes les parties terminées
-$stmt = $pdo->query("
+$stmt = $pdo->prepare("
     SELECT
       g.id_game,
       pw.nickname_player AS white_nick,
@@ -19,9 +19,12 @@ $stmt = $pdo->query("
     LEFT JOIN player pw ON g.player_white = pw.id_player
     LEFT JOIN player pb ON g.player_black = pb.id_player
     WHERE g.status = 'finished'
+      AND (g.player_white = :userId OR g.player_black = :userId)
     ORDER BY g.ended_at DESC
 ");
+$stmt->execute(['userId' => $_SESSION['user_id']]);
 $history = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -65,15 +68,23 @@ $history = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <td><?= htmlspecialchars($row['black_nick'] ?? '—') ?></td>
                                     <td>
                                         <?php
+                                        $isWhite = ($row['white_nick'] === $_SESSION['nickname_player']);
+                                        $isBlack = ($row['black_nick'] === $_SESSION['nickname_player']);
+
                                         if ($row['winner'] === 'draw') {
-                                            echo 'Match nul';
+                                            echo '⚖️ Match nul';
                                         } elseif ($row['winner'] === 'white') {
                                             echo htmlspecialchars($row['white_nick'] ?? '—');
-                                        } else {
+                                            echo $isWhite ? ' ✅' : ' ❌';
+                                        } elseif ($row['winner'] === 'black') {
                                             echo htmlspecialchars($row['black_nick'] ?? '—');
+                                            echo $isBlack ? ' ✅' : ' ❌';
+                                        } else {
+                                            echo '—';
                                         }
                                         ?>
                                     </td>
+
                                     <td><?= date('d/m/Y H:i', strtotime($row['ended_at'])) ?></td>
                                 </tr>
                             <?php endforeach; ?>

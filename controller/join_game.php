@@ -17,7 +17,7 @@ $gameId = (int)$_GET['game_id'];
 $userId = $_SESSION['user_id'];
 
 $stmt = $pdo->prepare("SELECT player_white, player_black FROM game WHERE id_game = ?");
-$stmt->execute([$gameId]);  // ← ajout du $
+$stmt->execute([$gameId]);
 $game = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$game) {

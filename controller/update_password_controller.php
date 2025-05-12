@@ -29,7 +29,7 @@ if (!password_verify($current, $user['password_player'])) {
     header("Location: ../view/update_password.php?message=Mot de passe actuel incorrect.&status=danger");
     exit();
 }
-$newHashed = password_hash($new, PASSWORD_DEFAULT);
+$newHashed = password_hash($new, PASSWORD_ARGON2I);
 $update = $pdo->prepare("UPDATE player SET password_player = ? WHERE id_player = ?");
 $update->execute([$newHashed, $userId]);
 header("Location: ../view/profile.php?message=Mot de passe mis à jour avec succès.&status=success");

@@ -1,5 +1,8 @@
 <?php
 session_start();
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 include("message.php");
 ?>
 <!DOCTYPE html>
@@ -30,6 +33,7 @@ include("message.php");
                         method="POST"
                         class="needs-validation"
                         novalidate>
+                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
                         <div class="mb-3">
                             <label for="email_player" class="form-label">Email de connexion</label>
                             <input

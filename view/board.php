@@ -1,5 +1,9 @@
 <?php
 session_start();
+if (empty($_SESSION['csrf_token'])) {
+  $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 if (!isset($_SESSION['user_id'])) {
   header("Location: login.php?message=Veuillez vous connecter.&status=warning");
   exit();
@@ -35,7 +39,7 @@ if ($mode === 'multi') {
   $stmt->execute([$gameId]);
   $game = $stmt->fetch(PDO::FETCH_ASSOC) ?: die("Partie introuvable.");
 
-  // ————— NOUVEAU : bloque le 3ᵉ joueur —
+  //  bloque le 3ᵉ joueur —
   $isWhite  = ($_SESSION['user_id'] == $game['player_white']);
   $isBlack  = ($_SESSION['user_id'] == $game['player_black']);
   $hasWhite = !is_null($game['player_white']);
@@ -159,6 +163,17 @@ if ($mode === 'multi') {
         </div>
       <?php endif; ?>
     </div>
+    <?php if ($mode === 'multi'): ?>
+      <div class="text-center mt-3">
+        <form action="../controller/forfeit_controller.php" method="POST" style="display:inline">
+          <input type="hidden" name="game_id" value="<?= htmlspecialchars($gameId) ?>">
+          <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
+          <button type="submit" class="btn btn-danger">
+            Abandonner la partie
+          </button>
+        </form>
+      </div>
+    <?php endif; ?>
 
     <div id="game-status" style="display:none;color:red;"></div>
     <div id="game-message" style="display:none;"></div>

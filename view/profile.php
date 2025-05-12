@@ -1,4 +1,10 @@
-<?php session_start(); ?>
+<?php
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php?message=Veuillez vous connecter.&status=warning");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="fr">
 

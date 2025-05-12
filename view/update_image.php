@@ -25,7 +25,7 @@ if (!isset($_SESSION['user_id'])) {
         <div class="container my-5 text-center">
             <h2 class="mb-4">Changer ma photo de profil</h2>
 
-            <img src="../public/img/uploads/<?php echo $_SESSION['image_player'] ?? 'default-avatar.png'; ?>" width="120" class="rounded-circle mb-3" alt="Photo actuelle">
+            <img src="../public/img/uploads/<?php echo $_SESSION['image_player'] ?? 'default-avatar.png'; ?>" width="180" class=" mb-3" alt="Photo actuelle">
 
             <form action="../controller/update_image_controller.php" method="POST" enctype="multipart/form-data" class="w-50 mx-auto">
                 <div class="mb-3">

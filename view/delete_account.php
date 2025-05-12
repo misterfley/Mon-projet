@@ -1,4 +1,8 @@
 <?php session_start();
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php?message=Veuillez vous connecter.&status=warning");
     exit();
@@ -14,7 +18,7 @@ if (!isset($_SESSION['user_id'])) {
     <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="../public/css/style.css">
     <script defer src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script defer src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
 
 
 </head>
@@ -30,6 +34,7 @@ if (!isset($_SESSION['user_id'])) {
             <form action="../controller/delete_account_controller.php" method="POST" class="w-50 mx-auto text-center mt-4">
                 <label for="confirm" class="form-label">Tapez <strong>SUPPRIMER</strong> pour confirmer :</label>
                 <input type="text" name="confirm" class="form-control text-center" required>
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
 
                 <button type="submit" class="btn btn-danger mt-4">Oui, supprimer mon compte</button>
             </form>

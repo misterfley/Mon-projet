@@ -243,16 +243,12 @@ function getGameStateWithCallback(callback) {
         return;
       }
 
-      // 1) on réaffiche le plateau
       renderBoard(data.board);
 
-      // 2) on met à jour l'indicateur de tour
       updateTurnIndicator(data.turn);
 
-      // 3) on bascule le tour courant
       currentTurn = data.turn;
 
-      // 4) si c'est la première fois, on récupère la couleur
       if (!playerColor && data.player_color) {
         playerColor = data.player_color;
         rotateBoardIfNeeded();

@@ -1,7 +1,3 @@
-function handleClick(e) {
-  const square = e.target.closest(".square");
-  if (!square) return;
-}
 function getPieceColor(piece) {
   if (!piece) return null;
   if (piece.classList.contains("white-piece")) return "white";

@@ -48,7 +48,7 @@ if (session_status() === PHP_SESSION_NONE) {
                         </a>
                     </li>
                     <li class="nav-item d-flex align-items-center ms-3">
-                        <a class="nav-link d-flex align-items-center" href="view/profile.php">
+                        <a class="nav-link d-flex align-items-center" href="profile.php">
                             <img src="../public/img/uploads/<?php echo $_SESSION['image_player'] ?? 'default-avatar.png'; ?>"
                                 class="rounded-circle me-2" width="35" height="35" alt="Avatar">
 

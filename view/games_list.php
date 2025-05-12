@@ -100,8 +100,9 @@ $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <?php foreach ($games as $game): ?>
                             <tr>
                                 <td>#<?= $game['id_game'] ?></td>
-                                <td><?= $game['white_nick']  ?? '<em>Libre</em>' ?></td>
-                                <td><?= $game['black_nick']  ?? '<em>Libre</em>' ?></td>
+                                <td><?= $game['white_nick'] ? htmlspecialchars($game['white_nick']) : '<em>Libre</em>' ?></td>
+                                <td><?= $game['black_nick'] ? htmlspecialchars($game['black_nick']) : '<em>Libre</em>' ?></td>
+
                                 <td>
                                     <?php if (is_null($game['player_white']) || is_null($game['player_black'])): ?>
                                         <a href="../controller/join_game.php?game_id=<?= $game['id_game'] ?>"
