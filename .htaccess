@@ -4,10 +4,10 @@ Options -Indexes
 # Active le moteur de réécriture
 RewriteEngine On
 
-# Force le HTTPS (si pas déjà en HTTPS)
+# Redirige vers HTTPS si non sécurisé
 RewriteCond %{HTTPS} !=on
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-# Redirige vers www si l'utilisateur accède sans www
-RewriteCond %{HTTP_HOST} ^korbvanbonobo\.com$ [NC]
-RewriteRule ^ https://www.korbvanbonobo.com%{REQUEST_URI} [L,R=301]
+# Redirige vers www si accédé sans www (pour misterfley.com)
+RewriteCond %{HTTP_HOST} ^misterfley\.com$ [NC]
+RewriteRule ^ https://www.misterfley.com%{REQUEST_URI} [L,R=301]

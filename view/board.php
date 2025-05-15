@@ -64,13 +64,9 @@ if ($mode === 'multi') {
 <html lang="fr">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <?php include("header.php"); ?>
   <title>Roque’N’Roll</title>
-  <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="../public/css/style.css">
   <link rel="stylesheet" href="../public/css/board.css">
-  <script defer src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 
 <body class="board-page">
@@ -91,10 +87,10 @@ if ($mode === 'multi') {
 
     <div class="board-wrapper">
       <?php if ($mode === 'multi'): ?>
-        <div class="player-card white-card">
-          <img src="../public/img/<?php echo htmlspecialchars($whiteAvatar) ?>"
-            class="avatar-sm" alt="Blanc">
-          <span class="player-name"><?php echo htmlspecialchars($whiteNick) ?></span>
+        <!-- Carte de l'adversaire -->
+        <div class="player-card opponent-card" id="opponent-card">
+          <img src="../public/img/default.png" alt="Avatar adversaire" id="opponent-avatar">
+          <div class="player-name" id="opponent-name">Adversaire</div>
         </div>
       <?php endif; ?>
 
@@ -156,10 +152,10 @@ if ($mode === 'multi') {
       </div>
 
       <?php if ($mode === 'multi'): ?>
-        <div class="player-card black-card">
-          <img src="../public/img/<?php echo htmlspecialchars($blackAvatar) ?>"
-            class="avatar-sm" alt="Noir">
-          <span class="player-name"><?php echo htmlspecialchars($blackNick) ?></span>
+        <!-- Carte du joueur actuel -->
+        <div class="player-card self-card" id="self-card">
+          <img src="../public/img/default.png" alt="Votre avatar" id="self-avatar">
+          <div class="player-name" id="self-name">Vous</div>
         </div>
       <?php endif; ?>
     </div>
@@ -168,10 +164,13 @@ if ($mode === 'multi') {
         <form action="../controller/forfeit_controller.php" method="POST" style="display:inline">
           <input type="hidden" name="game_id" value="<?= htmlspecialchars($gameId) ?>">
           <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
-          <button type="submit" class="btn btn-danger">
+          <button type="submit" class="btn btn-danger" id="forfeit-btn">
             Abandonner la partie
           </button>
         </form>
+      </div>
+      <div id="end-buttons" class="text-center mt-4" style="display: none;">
+        <a href="play.php" class="btn btn-outline-success">Retour au lobby</a>
       </div>
     <?php endif; ?>
 
@@ -223,6 +222,8 @@ if ($mode === 'multi') {
       navigator.sendBeacon?.("../controller/leave_game.php");
     });
   </script>
+
+
 </body>
 
 </html>

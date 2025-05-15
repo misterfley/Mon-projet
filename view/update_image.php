@@ -9,13 +9,8 @@ if (!isset($_SESSION['user_id'])) {
 <html lang="fr">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Changer ma photo</title>
-    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../public/css/style.css">
-    <script defer src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
+    <?php include("header.php"); ?>
 </head>
 
 <body>

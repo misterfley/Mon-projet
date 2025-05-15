@@ -182,27 +182,10 @@ body.board-page {
 }
 
 .board-wrapper {
-  position: relative;
-  display: inline-block;
-}
-
-.player-card {
-  position: absolute;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border: 2px solid transparent;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  z-index: 5;
-
-  width: 160px;
-  justify-content: center;
-  text-align: center;
+  gap: 1rem;
 }
 
 .player-card .player-name {
@@ -218,18 +201,10 @@ body.board-page {
   color: #333;
 }
 
-.white-card {
-  top: -10%;
-  left: 1%;
-  transform: translate(-50%, -20%);
-  border-color: var(--square-dark);
+.board-wrapper > .player-card {
+  margin: 0.5rem 0;
 }
-.black-card {
-  bottom: 0;
-  right: 0;
-  transform: translate(50%, 130%);
-  border-color: var(--square-dark);
-}
+
 .avatar-sm {
   width: 40px;
   height: 40px;
@@ -243,6 +218,40 @@ body.board-page {
   font-weight: 600;
   color: #222;
 }
+
+.player-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  width: fit-content;
+  margin: 1rem auto;
+  font-weight: bold;
+  width: 200px; /* ou 220px, à ajuster selon ton design */
+  min-height: 64px; /* facultatif pour garantir même hauteur */
+  justify-content: flex-start; /* pour éviter que le texte soit centré de travers */
+  border: 2px solid gold;
+  box-shadow: 0 0 8px gold;
+}
+
+.player-card img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.board-container {
+  display: flex;
+  justify-content: center;
+  margin: 1rem auto;
+}
+
 @media (max-width: 576px) {
   .board-zone {
     gap: 2rem;
@@ -262,16 +271,6 @@ body.board-page {
 
   .player-indicator {
     transform: translate(-50%, -230%);
-  }
-  .white-card {
-    top: 0;
-    left: 50%;
-    transform: translate(-50%, -100%);
-  }
-  .black-card {
-    bottom: 0;
-    left: 50%;
-    transform: translate(-50%, 100%);
   }
 
   .theme-switcher {

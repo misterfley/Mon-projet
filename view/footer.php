@@ -1,8 +1,3 @@
-<?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-?>
 <footer class="bg-dark text-light py-4 mt-4">
     <div class="container text-center">
         <div class="mb-2">

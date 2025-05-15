@@ -8,12 +8,11 @@ if (empty($_SESSION['user_id']) || $_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit('Accès non autorisé.');
 }
 
-// 2. Vérification CSRF (si tu en utilises un pour les actions)
+// 2. Vérification CSRF
 if (empty($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'])) {
     http_response_code(403);
     exit('Requête invalide (CSRF).');
 }
-// Optionnel : régénérer le token
 unset($_SESSION['csrf_token']);
 
 $userId = $_SESSION['user_id'];
@@ -60,8 +59,6 @@ try {
     exit;
 }
 
-// 5. Redirection et message
-header("Location: ../view/board.php?mode=multi&game_id={$gameId}&message="
-    . urlencode('Vous avez abandonné, partie terminée.')
-    . "&status=warning");
+// 5. Redirection vers l’historique avec message clair
+header("Location: ../view/history.php?message=" . urlencode("Vous avez abandonné la partie.") . "&status=warning");
 exit;

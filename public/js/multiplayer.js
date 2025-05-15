@@ -37,14 +37,25 @@ const pieceUnicodeMap = {
   bp: "♟",
 };
 
-let playerColor = null;
+let playerCardPositioned = false;
+let playerColor = window.gameConfig?.playerColor || null;
+
 let currentTurn = "white";
 let selectedSquare = null;
 function rotateBoardIfNeeded() {
+  console.log("[DEBUG] Rotation du plateau ?", playerColor);
+
   if (playerColor === "black") {
+    // Rotation de l'échiquier
     boardElement.style.transform = "rotate(180deg)";
     document.querySelectorAll(".square").forEach((square) => {
       square.style.transform = "rotate(180deg)";
+    });
+  } else {
+    // Réinitialisation au cas où le joueur redevient blanc (évite un bug visuel)
+    boardElement.style.transform = "rotate(0deg)";
+    document.querySelectorAll(".square").forEach((square) => {
+      square.style.transform = "rotate(0deg)";
     });
   }
 }
@@ -94,34 +105,111 @@ function getGameState() {
         console.error("Erreur :", data.error);
         return;
       }
+      // Partie terminée ?
+      if (data.status === "finished") {
+        clearInterval(window.gamePolling);
 
+        showMessage(
+          data.winner === playerColor
+            ? "Votre adversaire a abandonné. Vous avez gagné !"
+            : "Vous avez perdu la partie.",
+          true
+        );
+        // 1. Mets à jour la couleur et les cartes
+        if (data.player_color) {
+          playerColor = data.player_color;
+        }
+
+        if (playerColor === "white") {
+          document.getElementById("self-name").textContent =
+            data.white_nick ?? "Vous";
+          document.getElementById("self-avatar").src = `../public/img/${
+            data.white_avatar ?? "default.png"
+          }`;
+          document.getElementById("opponent-name").textContent =
+            data.black_nick ?? "Libre";
+          document.getElementById("opponent-avatar").src = `../public/img/${
+            data.black_avatar ?? "default.png"
+          }`;
+        } else if (playerColor === "black") {
+          document.getElementById("self-name").textContent =
+            data.black_nick ?? "Vous";
+          document.getElementById("self-avatar").src = `../public/img/${
+            data.black_avatar ?? "default.png"
+          }`;
+          document.getElementById("opponent-name").textContent =
+            data.white_nick ?? "Libre";
+          document.getElementById("opponent-avatar").src = `../public/img/${
+            data.white_avatar ?? "default.png"
+          }`;
+        }
+
+        document.querySelectorAll(".square").forEach((sq) => {
+          sq.style.pointerEvents = "none";
+        });
+
+        const buttons = document.getElementById("end-buttons");
+        if (buttons) {
+          buttons.style.display = "block";
+          const forfeitBtn = document.getElementById("forfeit-btn");
+          if (forfeitBtn) forfeitBtn.style.display = "none";
+
+          const lobbyLink = document.getElementById("lobby-link");
+          if (lobbyLink) {
+            lobbyLink.textContent =
+              data.winner === playerColor
+                ? "Retourner en salle après victoire"
+                : "Retourner en salle";
+          }
+        }
+
+        return;
+      }
+
+      // 1. Mise à jour du plateau
       renderBoard(data.board);
 
-      updateTurnIndicator(data.turn);
+      // 3. Mise à jour du tour
       currentTurn = data.turn;
+      updateTurnIndicator(currentTurn);
 
-      if (!playerColor && data.player_color) {
-        playerColor = data.player_color;
-        rotateBoardIfNeeded();
-      }
-      if (data.white_nick) {
-        const wCard = document.querySelector(".white-card");
-        wCard.querySelector(".player-name").textContent = data.white_nick;
-        wCard.querySelector("img").src = `../public/img/${data.white_avatar}`;
-      }
-      if (data.black_nick) {
-        const bCard = document.querySelector(".black-card");
-        bCard.querySelector(".player-name").textContent = data.black_nick;
-        bCard.querySelector("img").src = `../public/img/${data.black_avatar}`;
+      // 4. Rotation du plateau selon la couleur
+      rotateBoardIfNeeded();
+      // 5. Mise à jour des cartes joueurs pendant la partie
+      if (playerColor === "white") {
+        document.getElementById("self-name").textContent =
+          data.white_nick ?? "Vous";
+        document.getElementById("self-avatar").src = `../public/img/${
+          data.white_avatar ?? "default.png"
+        }`;
+        document.getElementById("opponent-name").textContent =
+          data.black_nick ?? "Libre";
+        document.getElementById("opponent-avatar").src = `../public/img/${
+          data.black_avatar ?? "default.png"
+        }`;
+      } else if (playerColor === "black") {
+        document.getElementById("self-name").textContent =
+          data.black_nick ?? "Vous";
+        document.getElementById("self-avatar").src = `../public/img/${
+          data.black_avatar ?? "default.png"
+        }`;
+        document.getElementById("opponent-name").textContent =
+          data.white_nick ?? "Libre";
+        document.getElementById("opponent-avatar").src = `../public/img/${
+          data.white_avatar ?? "default.png"
+        }`;
       }
 
+      // 5. Vérifie l’état du jeu
       setTimeout(() => {
         requestAnimationFrame(() => {
           checkGameStatus(currentTurn);
         });
       }, 50);
     })
-    .catch((err) => console.error("Erreur AJAX :", err));
+    .catch((err) => {
+      console.error("Erreur AJAX :", err);
+    });
 }
 
 function updateTurnIndicator(turn) {
@@ -232,8 +320,9 @@ function showMessage(message, persistent = false) {
 }
 
 // Rafraîchit automatiquement toutes les 2 secondes
-setInterval(getGameState, 2000);
+window.gamePolling = setInterval(getGameState, 2000);
 getGameState(); // initial
+
 function getGameStateWithCallback(callback) {
   fetch(`../controller/get_game_state.php?game_id=${gameId}`)
     .then((response) => response.json())
@@ -249,13 +338,10 @@ function getGameStateWithCallback(callback) {
 
       currentTurn = data.turn;
 
-      if (!playerColor && data.player_color) {
-        playerColor = data.player_color;
-        rotateBoardIfNeeded();
-      }
+      playerColor = data.player_color ?? playerColor;
 
-      // 5) on appelle le callback avec **currentTurn** pour vérifier
-      //    l'état du roi du joueur qui doit jouer **maintenant**
+      rotateBoardIfNeeded();
+
       if (typeof callback === "function") {
         callback(currentTurn);
       }
@@ -300,6 +386,7 @@ function checkGameStatus(color) {
     lastNoMoves = noMoves;
   }
 }
+
 // Récupération et application du thème
 document.addEventListener("DOMContentLoaded", () => {
   const themeSelect = document.getElementById("theme");

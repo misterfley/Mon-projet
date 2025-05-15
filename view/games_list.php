@@ -70,13 +70,10 @@ $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <html lang="fr">
 
 <head>
-    <meta charset="UTF-8">
     <title>Parties disponibles</title>
-    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../public/css/style.css">
-    <script defer src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
+    <?php include("header.php"); ?>
 </head>
+
 
 <body>
     <?php include("nav.php"); ?>
@@ -87,36 +84,39 @@ $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <?php if (empty($games)): ?>
                 <p class="text-center text-muted">Aucune partie disponible pour le moment.</p>
             <?php else: ?>
-                <table class="table table-striped text-center">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>ID</th>
-                            <th>Joueur Blanc</th>
-                            <th>Joueur Noir</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($games as $game): ?>
-                            <tr>
-                                <td>#<?= $game['id_game'] ?></td>
-                                <td><?= $game['white_nick'] ? htmlspecialchars($game['white_nick']) : '<em>Libre</em>' ?></td>
-                                <td><?= $game['black_nick'] ? htmlspecialchars($game['black_nick']) : '<em>Libre</em>' ?></td>
+                <div class="table-responsive">
 
-                                <td>
-                                    <?php if (is_null($game['player_white']) || is_null($game['player_black'])): ?>
-                                        <a href="../controller/join_game.php?game_id=<?= $game['id_game'] ?>"
-                                            class="btn btn-primary btn-sm">
-                                            Rejoindre
-                                        </a>
-                                    <?php else: ?>
-                                        <button class="btn btn-secondary btn-sm" disabled>Complet</button>
-                                    <?php endif; ?>
-                                </td>
+                    <table class="table table-striped text-center">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Joueur Blanc</th>
+                                <th>Joueur Noir</th>
+                                <th></th>
                             </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($games as $game): ?>
+                                <tr>
+                                    <td>#<?= $game['id_game'] ?></td>
+                                    <td><?= $game['white_nick'] ? htmlspecialchars($game['white_nick']) : '<em>Libre</em>' ?></td>
+                                    <td><?= $game['black_nick'] ? htmlspecialchars($game['black_nick']) : '<em>Libre</em>' ?></td>
+
+                                    <td>
+                                        <?php if (is_null($game['player_white']) || is_null($game['player_black'])): ?>
+                                            <a href="../controller/join_game.php?game_id=<?= $game['id_game'] ?>"
+                                                class="btn btn-primary btn-sm">
+                                                Rejoindre
+                                            </a>
+                                        <?php else: ?>
+                                            <button class="btn btn-secondary btn-sm" disabled>Complet</button>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
             <?php endif; ?>
         </div>
     </main>

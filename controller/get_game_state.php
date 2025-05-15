@@ -12,10 +12,11 @@ $gameId = (int)$_GET['game_id'];
 
 // 2) Chargement des données de la partie
 $stmt = $pdo->prepare("
-    SELECT current_board, turn, player_white, player_black
-      FROM game
-     WHERE id_game = ?
+    SELECT current_board, turn, player_white, player_black, status, winner
+    FROM game
+    WHERE id_game = ?
 ");
+
 $stmt->execute([$gameId]);
 $game = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -75,9 +76,12 @@ if ($game['player_black']) {
 echo json_encode([
     'board'         => $board,
     'turn'          => $turn,
+    'status'        => $game['status'],
+    'winner'        => $game['winner'],
     'player_color'  => $player_color,
     'white_nick'    => $white_nick,
     'white_avatar'  => $white_avatar,
     'black_nick'    => $black_nick,
     'black_avatar'  => $black_avatar,
 ]);
+exit;
